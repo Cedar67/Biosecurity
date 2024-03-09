@@ -1,0 +1,90 @@
+{% extends 'layout.html' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div>
+    <h2>Profile Page</h2>
+    <p></p>
+    <a href="{{ url_for('profile_edit') }}" class="input-lg text-center btn btn-primary btn-sm">Edit Profile</a>
+    <a href="{{ url_for('password_reset') }}" class="input-lg text-center btn btn-primary btn-sm">Reset Password</a>
+</div>
+
+<div>
+    <p>Your account details are below:</p>
+    <table>
+        <thead>
+            <tr>
+                <th class="text-center" width="100"></th>
+                <th class="text-center" width="300"></th>
+            </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>User ID:</td>
+            <td>{{ account[0] }}</td>
+        </tr>
+        <tr>
+            <td>User Name:</td>
+            <td>{{ account[10] }}</td>
+        </tr>
+        <tr>
+            <td>User Position:</td>
+            <td>{{ account[7] }}</td>
+        </tr>
+        <tr>
+            <td>First Name:</td>
+            <td>{{ account[1] }}</td>
+        </tr>
+        <tr>
+            <td>Last Name:</td>
+            <td>{{ account[2] }}</td>
+        </tr>
+        <tr>
+            <td>Email:</td>
+            <td>{{ account[3] }}</td>
+        </tr>
+        <tr>
+            <td>Address:</td>
+            <td>{{ account[4] }}</td>
+        </tr>
+        <tr>
+            <td>Phone:</td>
+            <td>{{ account[5] }}</td>
+        </tr>
+        <tr>
+            <td>Date Joined or Hired:</td>
+            <td>{{ account[6] }}</td>
+        </tr>
+        <tr>
+            <td>Department:</td>
+            <td>{{ account[8] }}</td>
+        </tr>
+        <tr>
+            <td>Status:</td>
+            <td>{{ account[9] }}</td>
+        </tr>
+        <!-- <tr>
+            <td>Photo:</td>
+            <td class="text-center">
+                <img src="data:;base64,{{ im }}" class="img-responsive form-control input-sm text-center">
+            </td>
+        </tr> -->
+        
+    </tbody>
+    </table>
+    
+    <p></p>
+        {% if msg[0] == 1 %}
+        <br>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>{{ msg[1] }}</strong>
+        </div>
+        {% elif msg[0] == 0 %}
+        <br>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>{{ msg[1] }}</strong>
+        </div>
+        {% endif %}
+</div>
+{% endblock %}
