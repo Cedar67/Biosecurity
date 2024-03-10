@@ -92,13 +92,9 @@ def login():
                     session['id'] = account[0]
                     session['username'] = account[1]
                     session['role'] = account[4]
+                    
                     # Redirect to dashboard page
-                    if session['role'] == "Controller":
-                        return redirect(url_for('dashboard_controller'))
-                    elif session['role'] == "Staff":
-                        return redirect(url_for('dashboard_staff'))
-                    elif session['role'] == "Admin":
-                        return redirect(url_for('dashboard_admin'))
+                    return redirect(url_for('dashboard'))
                 else:
                     #password incorrect
                     msg = 'Incorrect password!'
@@ -181,12 +177,17 @@ def home():
     return redirect(url_for('login'))
 
 
-@app.route('/dashboard_controller')
-def dashboard_controller():
+@app.route('/dashboard')
+def dashboard():
     # Check if user is loggedin
-    if 'loggedin' in session and session['role'] == "Controller":
-        # User is loggedin show them the home page
-        return render_template('dashboard_controller.html', username=session['username'], role=session['role'])
+    if 'loggedin' in session:
+        if session['role'] == "Controller":
+            # return redirect(url_for('dashboard_controller'))
+            return render_template('dashboard_controller.html', username=session['username'], role=session['role'])
+        elif session['role'] == "Staff":
+            return render_template('dashboard_staff.html', username=session['username'], role=session['role'])
+        elif session['role'] == "Admin":
+            return render_template('dashboard_admin.html', username=session['username'], role=session['role'])
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
 
