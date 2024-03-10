@@ -1,0 +1,80 @@
+{% extends 'layout.html' %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+<div>
+    <h2>Edit Profile Page</h2> 
+    <p></p>
+    <a href="{{ url_for('profile') }}" class="input-lg text-center btn btn-primary btn-sm">View Profile</a>
+    <a href="{{ url_for('password_reset') }}" class="input-lg text-center btn btn-primary btn-sm">Reset Password</a>
+</div>
+
+
+<div>
+    
+    <p>Your account details are below:</p>
+    <table>
+        <thead>
+            <tr>
+                <th class="text-center" width="100"></th>
+                <th class="text-center" width="500"></th>
+            </tr>
+        </thead>
+        <tbody>
+            
+        <form id="result_form" name="result_form" action="/profile_edit" method="post">
+            <tr>
+                <td>User ID:</td>
+                <td>{{ account[0] }}</td>
+            </tr>
+            <tr>
+                <td>User Name:</td>
+                <td>{{ account[10] }}</td>
+            </tr>
+            <tr>
+                <td>User Position:</td>
+                <td>{{ account[7] }}</td>
+            </tr>
+            <tr>
+                <td>First Name:</td>
+                <td><input type="text" value="{{ account[1] }}" name="firstname" placeholder="Input first name here"/></td>
+            </tr>
+            <tr>
+                <td>Last Name:</td>
+                <td><input type="text" value="{{ account[2] }}" name="lastname" placeholder="Input last name here"/></td>
+            </tr>
+            <tr>
+                <td>Email:</td>
+                <td><input type="email" value="{{ account[3] }}" name="email" placeholder="Input email here"/></td>
+            </tr>
+            <tr>
+                <td>Address:</td>
+                <td><input type="text" value="{{ account[4] }}" name="address" placeholder="Input address here"/></td>
+            </tr>
+            <tr>
+                <td>Phone:</td>
+                <td><input type="text" value="{{ account[5] }}" name="phone" placeholder="Input phone here"/></td>
+            </tr>
+            <tr>
+                <td>Date Joined or Hired:</td>
+                <td>{{ account[6] }}</td>
+            </tr>
+            <tr>
+                <td>Department:</td>
+                <td>{{ account[8] }}</td>
+            </tr>
+            <tr>
+                <td>Status:</td>
+                <td>{{ account[9] }}</td>
+            </tr>
+            
+            <tr>
+                <td> <input type="submit" value="Save" class="btn btn-primary btn-bg" data-toggle="modal" data-target="#myModal"/></td>
+            </tr>
+        </form>
+    </tbody>
+    </table>
+
+</div>
+{% endblock %}
