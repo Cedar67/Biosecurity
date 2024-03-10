@@ -3,6 +3,18 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-<h2>Dashboard Page For {{ role }}</h2>
+<br>
+<h1>Dashboard For {{ role }}</h1>
 <p>Welcome back, {{ username }}!</p>
+
+
+<div>
+    <h2>Here Are Your Exclusive Features</h2>
+    <p></p>
+    <a href="{{ url_for('profile_edit') }}" class="input-lg text-center btn btn-primary btn-sm">Edit Profile</a>
+    <p></p>
+    <a href="{{ url_for('password_reset') }}" class="input-lg text-center btn btn-primary btn-sm">Reset Password</a>
+</div>
+
+
 {% endblock %}
