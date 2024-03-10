@@ -91,8 +91,14 @@ def login():
                     session['loggedin'] = True
                     session['id'] = account[0]
                     session['username'] = account[1]
-                    # Redirect to home page
-                    return redirect(url_for('home'))
+                    session['role'] = account[4]
+                    # Redirect to dashboard page
+                    if session['role'] == "Controller":
+                        return redirect(url_for('dashboard_controller'))
+                    elif session['role'] == "Staff":
+                        return redirect(url_for('dashboard_staff'))
+                    elif session['role'] == "Admin":
+                        return redirect(url_for('dashboard_admin'))
                 else:
                     #password incorrect
                     msg = 'Incorrect password!'
@@ -107,6 +113,7 @@ def login():
             msg = 'Incorrect username'
     # Show the login form with message (if any)
     return render_template('index.html', msg=msg)
+
 
 # http://localhost:5000/register - this will be the registration page, we need to use both GET and POST requests
 @app.route('/register', methods=['GET', 'POST'])
@@ -161,6 +168,8 @@ def register():
     # Show registration form with message (if any)
     return render_template('register.html', msg=msg)
 
+
+
 # http://localhost:5000/home - this will be the home page, only accessible for loggedin users
 @app.route('/home')
 def home():
@@ -170,6 +179,17 @@ def home():
         return render_template('home.html', username=session['username'])
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
+
+
+@app.route('/dashboard_controller')
+def dashboard_controller():
+    # Check if user is loggedin
+    if 'loggedin' in session and session['role'] == "Controller":
+        # User is loggedin show them the home page
+        return render_template('dashboard_controller.html', username=session['username'], role=session['role'])
+    # User is not loggedin redirect to login page
+    return redirect(url_for('login'))
+
 
 # http://localhost:5000/profile - this will be the profile page, only accessible for loggedin users
 @app.route('/profile', methods=["GET","POST"])
