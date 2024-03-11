@@ -284,6 +284,7 @@ def profile():
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
 
+
 @app.route('/profile_edit', methods=["GET","POST"])
 def profile_edit():
     # Check if user is loggedin
@@ -345,6 +346,26 @@ def profile_edit():
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
 
+
+# http://localhost:5000/profile - this will be the profile page, only accessible for loggedin users
+@app.route('/profile_list', methods=["GET","POST"])
+def profile_list():
+    
+    if 'loggedin' in session :
+        if session['role'] == "Staff":
+            connection = getCursor()
+            sql = """   SELECT secureaccount.username, profile.*
+                        FROM profile 
+                        INNER JOIN secureaccount ON profile.id = secureaccount.id
+                        WHERE profile.department = 'Controller';"""
+            connection.execute(sql)
+            profile_list = connection.fetchall()
+            for list in profile_list:
+                print(list)
+            return render_template("profile_list.html", profile_list = profile_list)
+
+    # User is not loggedin redirect to login page
+    return redirect(url_for('login'))
 
 @app.route('/password_reset', methods=["GET","POST"])
 def password_reset():

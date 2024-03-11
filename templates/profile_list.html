@@ -1,0 +1,44 @@
+{% extends 'layout.html' %}
+
+{% block title %}Controllers Profile{% endblock %}
+
+{% block content %}
+<br>
+
+<div>
+    <!-- display list of guide-->
+    <h2>Controllers Profile List</h2>
+    <p></p>
+
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th class="text-center" width="5%">ID</th>
+                <th class="text-center" width="10%">User Name</th>
+                <th class="text-center" width="10%">First Name</th>
+                <th class="text-center" width="10%">Last Name</th>
+                <th class="text-center" width="15%">Email</th>
+                <th class="text-center" width="20%">Address</th>
+                <th class="text-center" width="10%">Phone</th>
+                <th class="text-center" width="15%">Date Joined</th>
+                <th class="text-center" width="5%">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for singlelist in profile_list %}
+            <tr>
+                <th class="text-center">{{singlelist[1]}}</th>
+                <th class="text-center">{{singlelist[0]}}</th>
+                <th class="text-center">{{singlelist[2]}}</th>
+                <th class="text-center">{{singlelist[3]}}</th>
+                <th class="text-center">{{singlelist[4]}}</th>
+                <th class="text-center">{{singlelist[5]}}</th>
+                <th class="text-center">{{singlelist[6]}}</th>
+                <th class="text-center">{{singlelist[7]}}</th>
+                <th class="text-center">{{singlelist[10]}}</th>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
