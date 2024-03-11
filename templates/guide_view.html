@@ -1,0 +1,31 @@
+{% extends 'layout.html' %}
+
+{% block title %}View Guide{% endblock %}
+
+{% block content %}
+
+
+<div>
+    <!-- display list of guide-->
+    <h2>View Animal Pest Guide</h2>
+    <p></p>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th class="text-center" width="30">Common Name</th>
+                <th class="text-center" width="200">Primary Image</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for guide in guide_list %}
+            <tr>
+                <td class="text-center">{{guide[1]}}</td>
+                <td class="text-center">
+                    <a href="guide_details?id={{guide[0]}}"><img src="data:;base64,{{ guide[2] }}" class="img-responsive form-control input-sm text-center"></a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

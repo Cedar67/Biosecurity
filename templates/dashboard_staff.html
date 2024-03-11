@@ -5,7 +5,7 @@
 {% block content %}
 <br>
 <h1>Dashboard For {{ role }}</h1>
-<p>Welcome back, {{ username }}!</p>
+<p class="fs-6"><strong>Welcome Back, {{ username }}!</strong></p>
 
 
 <div>
@@ -17,32 +17,9 @@
     <p></p>
     <a href="{{ url_for('password_reset') }}" class="input-lg text-center btn btn-primary btn-sm">Reset Password</a>
     <p></p>
-    <a href="{{ url_for('profile_list') }}" class="input-lg text-center btn btn-primary btn-sm">View All of Controllers Profile</a>
-</div>
-
-
-
-<div>
-    <!-- display list of guide-->
-    <h2>Animal Pest Guide List</h2>
+    <a href="{{ url_for('profile_list') }}" class="input-lg text-center btn btn-primary btn-sm">View Controllers Profile</a>
     <p></p>
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th class="text-center" width="30">Common Name</th>
-                <th class="text-center" width="200">Primary Image</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for guide in guide_list %}
-            <tr>
-                <td class="text-center">{{guide[1]}}</td>
-                <td class="text-center">
-                    <a href="guide_details?id={{guide[0]}}"><img src="data:;base64,{{ guide[2] }}" class="img-responsive form-control input-sm text-center"></a>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <a href="{{ url_for('guide_manage') }}" class="input-lg text-center btn btn-primary btn-sm">Manage Guide</a>
 </div>
+
 {% endblock %}

@@ -260,7 +260,155 @@ def guide_details():
         image1 = base64.b64encode(details[10]).decode('utf-8')
         image2 = base64.b64encode(details[11]).decode('utf-8')
 
-        return render_template('guide_details.html', details=details, image1=image1, image2=image2, msg=msg)
+        return render_template('guide_details.html', details=details, image1=image1, image2=image2, msg=msg, role=session['role'])
+    # User is not loggedin redirect to login page
+    return redirect(url_for('login'))
+
+
+
+@app.route('/guide_delete', methods=["GET","POST"])
+def guide_delete():
+    # Check if user is loggedin
+    if 'loggedin' in session:
+        if session['role'] == "Admin" or session['role'] == "Staff":
+            # Output message to Webpage
+            msg = [-1,""]
+            
+            id = request.args.get('id')
+            # We need all the guide_details info for the user so we can display it on the profile page
+            cursor = getCursor()   
+            sql = """   DELETE FROM guide 
+                        WHERE id = %s"""
+            cursor.execute(sql, (int(id),))
+            details = cursor.fetchone()
+
+            msg = [1,'You have deleted this guide details successfully!']
+            return render_template('guide_details.html', details=details, image1=None, image2=None, msg=msg, role="session['role']")
+    # User is not loggedin redirect to login page
+    return redirect(url_for('login'))
+
+
+@app.route('/guide_view')
+def guide_view():
+    # Check if user is loggedin
+    if 'loggedin' in session:
+        if session['role'] == "Controller":
+            cursor = getCursor()   
+            cursor.execute("SELECT id,common_name,image1 FROM guide;")
+            guide_touple = cursor.fetchall()
+            guide_list = []
+            # Convert binary blob data to base64 encoding
+            for guide in guide_touple:
+                i=0
+                guideUpdate = [] 
+                for i in range(0, 3):
+                    if i == 2:
+                        guideUpdate.append(base64.b64encode(guide[2]).decode('utf-8'))
+                    guideUpdate.append(guide[i])
+                guide_list.append(guideUpdate)
+
+            return render_template('guide_view.html', guide_list=guide_list)
+    # User is not loggedin redirect to login page
+    return redirect(url_for('login'))
+
+
+
+@app.route('/guide_edit', methods=["GET","POST"])
+def guide_edit():
+    # Check if user is loggedin
+    if 'loggedin' in session:
+        if session['role'] == "Admin" or session['role'] == "Staff":
+
+            # Output message to Webpage
+            msg = [-1,""]
+
+            id = request.args.get('id')
+            if request.method == "GET":
+                # We need all the guide_details info for the user so we can display it on the profile page
+                cursor = getCursor()   
+                sql = """   SELECT *
+                            FROM guide 
+                            WHERE id = %s"""
+                cursor.execute(sql, (id,))
+                details = cursor.fetchone()
+                # Convert binary blob data to base64 encoding
+                image1 = base64.b64encode(details[10]).decode('utf-8')
+                image2 = base64.b64encode(details[11]).decode('utf-8')
+
+                return render_template('guide_edit.html', details=details, image1=image1, image2=image2, msg=msg)
+            
+            elif request.method == "POST":
+                # Check if "firstname", "lastname" and "email" POST requests exist (user submitted form)
+                if 'common_name' in request.form:
+                    # Get new Value from guide edit
+                    id = request.args.get('id')
+                    common_name = request.form['common_name']
+                    scientific_name = request.form['scientific_name']
+                    description = request.form['description']
+                    distribution = request.form['distribution']
+                    size = request.form['size']
+                    droppings = request.form['droppings']
+                    footprints = request.form['footprints']
+                    impact = request.form['impact']
+                    control_methods = request.form['control_methods']
+
+                    # Update new guide details information into profile table
+                    cursor = getCursor()
+                    sql = """   UPDATE guide 
+                                SET common_name = %s, scientific_name = %s, description = %s, distribution = %s, size = %s, droppings = %s, footprints = %s, impact = %s, control_methods = %s
+                                WHERE id = %s;"""
+                                
+                    cursor.execute(sql, (common_name, scientific_name, description, distribution, size, droppings, footprints, impact, control_methods, id, ))
+                    cursor.fetchall()
+
+                    msg = [1,'You have updated this guide details successfully!']
+
+                    cursor = getCursor()   
+                    sql = """   SELECT *
+                                FROM guide 
+                                WHERE id = %s"""
+                    cursor.execute(sql, (id,))
+                    details_update = cursor.fetchone()
+                    # Convert binary blob data to base64 encoding
+                    image1 = base64.b64encode(details_update[10]).decode('utf-8')
+                    image2 = base64.b64encode(details_update[11]).decode('utf-8')
+
+                    return render_template('guide_details.html', details=details_update, image1=image1, image2=image2, msg=msg)
+                else:
+                    # Form is empty... (no POST data)
+                    msg = 'Please fill out the form!'
+
+    # User is not loggedin redirect to login page
+    return redirect(url_for('login'))
+
+
+@app.route('/guide_manage')
+def guide_manage():
+    # Check if user is loggedin
+    if 'loggedin' in session:
+        if session['role'] == "Admin" or session['role'] == "Staff":
+        
+            # Output message to Webpage
+            msg = [-1,""]
+
+            if request.method == "GET":
+                cursor = getCursor()   
+                cursor.execute("SELECT id,common_name,image1 FROM guide;")
+                guide_touple = cursor.fetchall()
+                guide_list = []
+                # Convert binary blob data to base64 encoding
+                for guide in guide_touple:
+                    i=0
+                    guideUpdate = [] 
+                    for i in range(0, 3):
+                        if i == 2:
+                            guideUpdate.append(base64.b64encode(guide[2]).decode('utf-8'))
+                        guideUpdate.append(guide[i])
+                    guide_list.append(guideUpdate)
+
+                return render_template('guide_manage.html', guide_list=guide_list)
+            elif request.method == "POST":
+                pass
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
 
@@ -367,6 +515,7 @@ def profile_list():
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
 
+
 @app.route('/password_reset', methods=["GET","POST"])
 def password_reset():
     # Check if user is loggedin
@@ -402,6 +551,7 @@ def password_reset():
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
 
+
 # http://localhost:5000/logout - this will be the logout page
 @app.route('/logout')
 def logout():
@@ -411,6 +561,7 @@ def logout():
    session.pop('username', None)
    # Redirect to login page
    return redirect(url_for('login'))
+
 
 if __name__ == '__main__':
     app.run(debug=True)

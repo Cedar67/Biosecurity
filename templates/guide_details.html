@@ -7,8 +7,34 @@
     <h2>Animal Pest Guide Details</h2>
 </div>
 
+
 <div>
-    <table>
+    
+{% if msg[0] == 1 %}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+    <strong>{{ msg[1] }}</strong>
+</div>
+{% elif msg[0] == 0 %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{ msg[1] }}</strong>
+</div>
+{% endif %}
+
+{% if (role != "Controller") and (details != None) %}
+    <a href="guide_edit?id={{details[0]}}" class="btn btn-primary btn-bg" data-toggle="modal" data-target="#myModal">Edit</a>
+    <a href="guide_delete?id={{details[0]}}" class="btn btn-primary btn-bg" data-toggle="modal" data-target="#myModal">Delete</a>
+    <a href="guide_manage" class="btn btn-primary btn-bg" data-toggle="modal" data-target="#myModal">List View</a>
+{% endif %}
+
+{% if (role != "Controller") and (details == None) %}
+    <a href="guide_manage" class="btn btn-primary btn-bg" data-toggle="modal" data-target="#myModal">List View</a>
+{% endif %}
+
+{% if role == "Controller" %}
+    <a href="guide_view" class="btn btn-primary btn-bg" data-toggle="modal" data-target="#myModal">List View</a>
+{% endif %}
+<p>
+<table>
         <thead>
             <tr>
                 <th class="text-center" width="200"></th>
@@ -46,30 +72,22 @@
         <tr>
             <td>Images-1:</td> 
             <td class="text-center">
-                <img src="data:;base64,{{ image1 }}" class="img-responsive form-control input-sm text-center">
+                {% if image1 != None %}
+                    <img src="data:;base64,{{ image1 }}">
+                {% endif %}
             </td>
         </tr>
         <tr>
             <td>Images-2:</td> 
             <td class="text-center">
-                <img src="data:;base64,{{ image2 }}" class="img-responsive form-control input-sm text-center">
+                {% if image2 != None %}
+                    <img src="data:;base64,{{ image2 }}">
+                {% endif %}
             </td>
         </tr>
         
     </tbody>
     </table>
     
-    <p></p>
-        {% if msg[0] == 1 %}
-        <br>
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <strong>{{ msg[1] }}</strong>
-        </div>
-        {% elif msg[0] == 0 %}
-        <br>
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <strong>{{ msg[1] }}</strong>
-        </div>
-        {% endif %}
 </div>
 {% endblock %}
