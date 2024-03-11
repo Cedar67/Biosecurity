@@ -59,6 +59,43 @@ def index():
     return redirect(url_for('login'))
 
 
+# http://localhost:5000/register - this will be the registration page, we need to use both GET and POST requests
+@app.route('/add_image', methods=['GET','POST'])
+def add_image():
+    if request.method == 'POST':
+        # Create variables for easy access
+        id = int(request.form['id'])
+        # image1 = request.form['phone1']
+        # image2 = request.form['phone2']
+
+        picture1 = request.files['photo1']
+        pictureByte1 = picture1.read()
+        picture1.close()
+        base64picture1 = base64.b64encode(pictureByte1).decode('utf-8')
+        
+        picture2 = request.files['photo2']
+        pictureByte2 = picture2.read()
+        picture2.close()
+        base64picture2 = base64.b64encode(pictureByte2).decode('utf-8')
+
+        cursor = getCursor()
+        sql = """   UPDATE guide 
+                    SET image1 = %s, image2 = %s
+                    WHERE id = %s;"""   
+        # cursor.execute(sql, (base64picture1, base64picture2, id, ))
+        cursor.execute(sql, (pictureByte1, pictureByte2, id, ))
+        cursor.fetchone()
+
+        # connection.commit()
+        msg = 'You have successfully registered!'
+        cursor.close()
+        connection.close()
+
+    # Show registration form with message (if any)
+    return render_template('add_image.html')
+
+
+
 # http://localhost:5000/login/ - this will be the login page, we need to use both GET and POST requests
 @app.route('/login/', methods=['GET', 'POST'])
 def login():
@@ -130,9 +167,6 @@ def register():
         dateCurrrent = datetime.datetime.now()
         dateJoined = str(dateCurrrent.day) +"/"+ str(dateCurrrent.month) +"/"+ str(dateCurrrent.year)
         parameters = (firstname, lastname, email, address, phone, dateJoined, "Pest Controller","Controller","Active",)
-        # picture = request.files['photo']
-        # pictureByte = picture.read()
-        # picture.close()
 
         # Check if account exists using MySQL
         cursor = getCursor()
@@ -181,13 +215,52 @@ def home():
 def dashboard():
     # Check if user is loggedin
     if 'loggedin' in session:
+        cursor = getCursor()   
+        cursor.execute("SELECT id,common_name,image1 FROM guide;")
+        guide_touple = cursor.fetchall()
+        guide_list = []
+        # Convert binary blob data to base64 encoding
+        for guide in guide_touple:
+            i=0
+            guideUpdate = [] 
+            for i in range(0, 3):
+                if i == 2:
+                    guideUpdate.append(base64.b64encode(guide[2]).decode('utf-8'))
+                guideUpdate.append(guide[i])
+            guide_list.append(guideUpdate)
+
         if session['role'] == "Controller":
             # return redirect(url_for('dashboard_controller'))
-            return render_template('dashboard_controller.html', username=session['username'], role=session['role'])
+            return render_template('dashboard_controller.html', username=session['username'], role=session['role'], guide_list=guide_list)
         elif session['role'] == "Staff":
-            return render_template('dashboard_staff.html', username=session['username'], role=session['role'])
+            return render_template('dashboard_staff.html', username=session['username'], role=session['role'], guide_list=guide_list)
         elif session['role'] == "Admin":
-            return render_template('dashboard_admin.html', username=session['username'], role=session['role'])
+            return render_template('dashboard_admin.html', username=session['username'], role=session['role'], guide_list=guide_list)
+    # User is not loggedin redirect to login page
+    return redirect(url_for('login'))
+
+
+
+@app.route('/guide_details', methods=["GET","POST"])
+def guide_details():
+    # Check if user is loggedin
+    if 'loggedin' in session:
+        # Output message to Webpage
+        msg = [-1,""]
+        
+        id = request.args.get('id')
+        # We need all the guide_details info for the user so we can display it on the profile page
+        cursor = getCursor()   
+        sql = """   SELECT *
+                    FROM guide 
+                    WHERE id = %s"""
+        cursor.execute(sql, (id,))
+        details = cursor.fetchone()
+        # Convert binary blob data to base64 encoding
+        image1 = base64.b64encode(details[10]).decode('utf-8')
+        image2 = base64.b64encode(details[11]).decode('utf-8')
+
+        return render_template('guide_details.html', details=details, image1=image1, image2=image2, msg=msg)
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
 
@@ -207,16 +280,6 @@ def profile():
                     WHERE secureaccount.id = %s"""
         cursor.execute(sql, (session['id'],))
         account = cursor.fetchone()
-        # Convert binary blob data to base64 encoding
-        # image = base64.b64encode(account[4]).decode('utf-8')
-
-        # im = Image.open(io.BytesIO(account[4]))
-        # im.show()
-
-        # image_data = Image.open(account[4])
-        # account[4] = im
-        # image_data.show()
-        # Show the profile page with account info
         return render_template('profile.html', account=account, msg=msg)
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))

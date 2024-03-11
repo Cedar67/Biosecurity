@@ -1,0 +1,75 @@
+{% extends 'layout.html' %}
+
+{% block title %}Guide Details{% endblock %}
+
+{% block content %}
+<div>
+    <h2>Animal Pest Guide Details</h2>
+</div>
+
+<div>
+    <table>
+        <thead>
+            <tr>
+                <th class="text-center" width="200"></th>
+                <th class="text-center" width="600"></th>
+            </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Common Name:</td> <td>{{ details[1] }}</td>
+        </tr>
+        <tr>
+            <td>Scientific Name:</td> <td>{{ details[2] }}</td>
+        </tr>
+        <tr>
+            <td>Description:</td> <td>{{ details[3] }}</td>
+        </tr>
+        <tr>
+            <td>Distribution:</td> <td>{{ details[4] }}</td>
+        </tr>
+        <tr>
+            <td>Size:</td> <td>{{ details[5] }}</td>
+        </tr>
+        <tr>
+            <td>Droppings:</td> <td>{{ details[6] }}</td>
+        </tr>
+        <tr>
+            <td>Foot Prints:</td> <td>{{ details[7] }}</td>
+        </tr>
+        <tr>
+            <td>Impacts:</td> <td>{{ details[8] }}</td>
+        </tr>
+        <tr>
+            <td>Control Methods:</td> <td>{{ details[9] }}</td>
+        </tr>
+        <tr>
+            <td>Images-1:</td> 
+            <td class="text-center">
+                <img src="data:;base64,{{ image1 }}" class="img-responsive form-control input-sm text-center">
+            </td>
+        </tr>
+        <tr>
+            <td>Images-2:</td> 
+            <td class="text-center">
+                <img src="data:;base64,{{ image2 }}" class="img-responsive form-control input-sm text-center">
+            </td>
+        </tr>
+        
+    </tbody>
+    </table>
+    
+    <p></p>
+        {% if msg[0] == 1 %}
+        <br>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>{{ msg[1] }}</strong>
+        </div>
+        {% elif msg[0] == 0 %}
+        <br>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>{{ msg[1] }}</strong>
+        </div>
+        {% endif %}
+</div>
+{% endblock %}
