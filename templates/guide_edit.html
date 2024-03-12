@@ -8,10 +8,21 @@
 </div>
 
 <div>
+
+    {% if msg[0] == 1 %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>{{ msg[1] }}</strong>
+    </div>
+    {% elif msg[0] == 0 %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>{{ msg[1] }}</strong>
+    </div>
+    {% endif %}
+    
     <table>
         <thead>
             <tr>
-                <th class="text-center" width="200"></th>
+                <th class="text-center" width="260"></th>
                 <th class="text-center" width="600"></th>
             </tr>
         </thead>

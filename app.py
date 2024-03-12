@@ -382,6 +382,70 @@ def guide_edit():
     return redirect(url_for('login'))
 
 
+@app.route('/guide_add', methods=["GET","POST"])
+def guide_add():
+    # Check if user is loggedin
+    if 'loggedin' in session:
+        if session['role'] == "Admin" or session['role'] == "Staff":
+
+            # Output message to Webpage
+            msg = [-1,""]
+            if request.method == "GET":
+                return render_template('guide_add.html', msg=msg)
+            
+            elif request.method == "POST":
+                if request.form['common_name'] != '':
+                    # Get new Value from guide add
+                    common_name = request.form['common_name']
+                    scientific_name = request.form['scientific_name']
+                    description = request.form['description']
+                    distribution = request.form['distribution']
+                    size = request.form['size']
+                    droppings = request.form['droppings']
+                    footprints = request.form['footprints']
+                    impact = request.form['impact']
+                    control_methods = request.form['control_methods']
+                    picture1 = request.files['photo1']
+                    image1 = picture1.read()
+                    picture1.close()
+                    
+                    picture2 = request.files['photo2']
+                    image2 = picture2.read()
+                    picture2.close()
+                    # Update new guide details information into profile table
+                    cursor = getCursor()
+                    sql = """   INSERT INTO guide VALUES (NULL,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
+                    cursor.execute(sql, (common_name, scientific_name, description, distribution, size, droppings, footprints, impact, control_methods, image1, image2, ))
+                    cursor.fetchall()
+
+
+                    msg = [1,'You have added a new guide details successfully!']
+
+                    # Get new list of guide and link to guide manage page
+                    cursor = getCursor()   
+                    cursor.execute("SELECT id,common_name,image1 FROM guide;")
+                    guide_touple = cursor.fetchall()
+                    guide_list = []
+                    # Convert binary blob data to base64 encoding
+                    for guide in guide_touple:
+                        i=0
+                        guideUpdate = [] 
+                        for i in range(0, 3):
+                            if i == 2:
+                                guideUpdate.append(base64.b64encode(guide[2]).decode('utf-8'))
+                            guideUpdate.append(guide[i])
+                        guide_list.append(guideUpdate)
+
+                    return render_template('guide_manage.html', guide_list=guide_list, msg=msg)
+                else:
+                    # Form is empty... (no POST data)
+                    msg = [0,'Please fill out the form!']
+                    return render_template('guide_add.html', msg=msg)
+
+    # User is not loggedin redirect to login page
+    return redirect(url_for('login'))
+
+
 @app.route('/guide_manage')
 def guide_manage():
     # Check if user is loggedin
@@ -406,7 +470,7 @@ def guide_manage():
                         guideUpdate.append(guide[i])
                     guide_list.append(guideUpdate)
 
-                return render_template('guide_manage.html', guide_list=guide_list)
+                return render_template('guide_manage.html', guide_list=guide_list, msg=msg)
             elif request.method == "POST":
                 pass
     # User is not loggedin redirect to login page
