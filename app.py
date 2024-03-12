@@ -230,11 +230,10 @@ def dashboard():
             guide_list.append(guideUpdate)
 
         if session['role'] == "Controller":
-            # return redirect(url_for('dashboard_controller'))
             return render_template('dashboard_controller.html', username=session['username'], role=session['role'], guide_list=guide_list)
         elif session['role'] == "Staff":
             return render_template('dashboard_staff.html', username=session['username'], role=session['role'], guide_list=guide_list)
-        elif session['role'] == "Admin":
+        elif session['role'] == "Administrator":
             return render_template('dashboard_admin.html', username=session['username'], role=session['role'], guide_list=guide_list)
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
@@ -270,7 +269,7 @@ def guide_details():
 def guide_delete():
     # Check if user is loggedin
     if 'loggedin' in session:
-        if session['role'] == "Admin" or session['role'] == "Staff":
+        if session['role'] == "Administrator" or session['role'] == "Staff":
             # Output message to Webpage
             msg = [-1,""]
             
@@ -317,7 +316,7 @@ def guide_view():
 def guide_edit():
     # Check if user is loggedin
     if 'loggedin' in session:
-        if session['role'] == "Admin" or session['role'] == "Staff":
+        if session['role'] == "Administrator" or session['role'] == "Staff":
 
             # Output message to Webpage
             msg = [-1,""]
@@ -386,7 +385,7 @@ def guide_edit():
 def guide_add():
     # Check if user is loggedin
     if 'loggedin' in session:
-        if session['role'] == "Admin" or session['role'] == "Staff":
+        if session['role'] == "Administrator" or session['role'] == "Staff":
 
             # Output message to Webpage
             msg = [-1,""]
@@ -450,7 +449,7 @@ def guide_add():
 def guide_manage():
     # Check if user is loggedin
     if 'loggedin' in session:
-        if session['role'] == "Admin" or session['role'] == "Staff":
+        if session['role'] == "Administrator" or session['role'] == "Staff":
         
             # Output message to Webpage
             msg = [-1,""]
@@ -484,15 +483,22 @@ def profile():
     if 'loggedin' in session:
         # Output message to Webpage
         msg = [-1,""]
-        # We need all the account info for the user so we can display it on the profile page
+
+        type1 = type(request.args.get('id'))
+        if type1==type("string"):
+            id = int(request.args.get('id'))
+        else:
+            id = session['id']
+
+        # Get all the account info for the user to display it on the profile page
         cursor = getCursor()   
         sql = """   SELECT profile.*, secureaccount.username 
                     FROM secureaccount 
                     INNER JOIN profile ON secureaccount.id = profile.id 
                     WHERE secureaccount.id = %s"""
-        cursor.execute(sql, (session['id'],))
+        cursor.execute(sql, (id,))
         account = cursor.fetchone()
-        return render_template('profile.html', account=account, msg=msg)
+        return render_template('profile_details.html', account=account, msg=msg, id=id, seesionId = session['id'])
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
 
@@ -505,6 +511,12 @@ def profile_edit():
         # Output message to Webpage
         msg = [-1,""]
 
+        type1 = type(request.args.get('id'))
+        if type1==type("string"):
+            id = int(request.args.get('id'))
+        else:
+            id = session['id']
+
         if request.method == "GET":
             # We need all the account info for the user so we can display it on the profile page
             cursor = getCursor()   
@@ -512,9 +524,9 @@ def profile_edit():
                         FROM secureaccount 
                         INNER JOIN profile ON secureaccount.id = profile.id 
                         WHERE secureaccount.id = %s"""
-            cursor.execute(sql, (session['id'],))
+            cursor.execute(sql, (id,))
             account = cursor.fetchone()
-            return render_template('profile_edit.html', account=account)
+            return render_template('profile_edit.html', account=account, id=id, seesionId = session['id'])
         elif request.method == "POST":
             # Check if "firstname", "lastname" and "email" POST requests exist (user submitted form)
             if 'firstname' in request.form and 'lastname' in request.form and 'email' in request.form and 'address' in request.form and 'phone' in request.form:
@@ -535,7 +547,7 @@ def profile_edit():
                                 SET first_name = %s, last_name = %s, email = %s, address = %s, phone = %s
                                 WHERE id = %s;"""
                                 
-                    cursor.execute(sql, (firstname, lastname, email, address, phone, session['id'], ))
+                    cursor.execute(sql, (firstname, lastname, email, address, phone, id, ))
                     cursor.fetchall()
 
                     msg = [1,'You have successfully updated profile information!']
@@ -545,12 +557,12 @@ def profile_edit():
                                 FROM secureaccount 
                                 INNER JOIN profile ON secureaccount.id = profile.id 
                                 WHERE secureaccount.id = %s"""
-                    cursor.execute(sql1, (session['id'],))
+                    cursor.execute(sql1, (id,))
                     account = cursor.fetchone()
                     
                     cursor.close()
                     connection.close()   
-                    return render_template('profile.html', msg=msg, account=account)
+                    return render_template('profile_details.html', msg=msg, account=account, id=id, seesionId = session['id'])
             else:
                 # Form is empty... (no POST data)
                 msg = 'Please fill out the form!'
@@ -559,22 +571,36 @@ def profile_edit():
     return redirect(url_for('login'))
 
 
-# http://localhost:5000/profile - this will be the profile page, only accessible for loggedin users
-@app.route('/profile_list', methods=["GET","POST"])
+# http://localhost:5000/profile_list - this will be the profile page, only accessible for loggedin users - Staff and Administrator
+@app.route('/profile_list', methods=["GET"])
 def profile_list():
     
     if 'loggedin' in session :
-        if session['role'] == "Staff":
-            connection = getCursor()
+        if session['role'] == "Staff" or session['role'] == "Administrator":
+            
             sql = """   SELECT secureaccount.username, profile.*
                         FROM profile 
                         INNER JOIN secureaccount ON profile.id = secureaccount.id
-                        WHERE profile.department = 'Controller';"""
-            connection.execute(sql)
-            profile_list = connection.fetchall()
-            for list in profile_list:
-                print(list)
-            return render_template("profile_list.html", profile_list = profile_list)
+                        WHERE profile.department = %s;"""
+            
+            connection = getCursor()
+
+            if session['role'] == "Staff":
+                roleSQL = ('Controller',)
+                connection.execute(sql, roleSQL)
+                profile_list = connection.fetchall()
+                for list in profile_list:
+                    print(list)
+                return render_template("profile_view.html", profile_list = profile_list)
+            
+            if session['role'] == "Administrator":
+                role = request.args.get('role')
+                roleSQL = (role,)
+                connection.execute(sql, roleSQL)
+                profile_list = connection.fetchall()
+                for list in profile_list:
+                    print(list)
+                return render_template("profile_manage.html", profile_list = profile_list, role=role)
 
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
@@ -587,8 +613,21 @@ def password_reset():
         # Output message to Webpage
         msg = [-1,""]
 
+        type1 = type(request.args.get('id'))
+        if type1==type("string"):
+            id = int(request.args.get('id'))
+        else:
+            id = session['id']
+
         if request.method == "GET":
-            return render_template('password_reset.html')
+            # Get the username for change password
+            cursor = getCursor()   
+            sql = """   SELECT secureaccount.id, secureaccount.username 
+                        FROM secureaccount
+                        WHERE secureaccount.id = %s"""
+            cursor.execute(sql, (id,))
+            account = cursor.fetchone()
+            return render_template('password_reset.html', account=account, id=id, seesionId = session['id'])
         
         elif request.method == "POST":
             # Check if "password" POST requests exist (user submitted form)
@@ -601,13 +640,13 @@ def password_reset():
                             SET password = %s
                             WHERE id = %s;"""
                 hashed = hashing.hash_value(password, salt='abcd')
-                cursor.execute(sql, (hashed, session['id'], ))
+                cursor.execute(sql, (hashed, id, ))
                 cursor.fetchall()
                 cursor.close()
                 connection.close()  
                 msg = [1,'You have successfully changed password!']
  
-                return render_template('password_reset.html', msg=msg)
+                return render_template('password_reset.html', msg=msg, id=id, seesionId = session['id'])
             else:
                 # Form is empty... (no POST data)
                 msg = 'Please fill out the form!'

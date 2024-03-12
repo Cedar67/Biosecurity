@@ -1,0 +1,27 @@
+{% extends 'layout.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<br>
+<h1>Dashboard For {{ role }}</h1>
+<p class="fs-6"><strong>Welcome Back, {{ username }}!</strong></p>
+
+
+<div>
+    <h2>Here Are Your Exclusive Features</h2>
+    <p></p>
+    <a href="{{ url_for('profile') }}" class="input-lg text-center btn btn-primary btn-sm">View Your Own Profile</a>
+    <p></p>
+    <a href="{{ url_for('profile_edit') }}" class="input-lg text-center btn btn-primary btn-sm">Edit Your Own Profile</a>
+    <p></p>
+    <a href="{{ url_for('password_reset') }}" class="input-lg text-center btn btn-primary btn-sm">Reset Password</a>
+    <p></p>
+    <a href="profile_list?role=Controller" class="input-lg text-center btn btn-primary btn-sm">Manage Controllers Profile</a>
+    <p></p>
+    <a href="profile_list?role=Staff" class="input-lg text-center btn btn-primary btn-sm">Manage Staff Profile</a>
+    <p></p>
+    <a href="{{ url_for('guide_manage') }}" class="input-lg text-center btn btn-primary btn-sm">Manage Guide</a>
+</div>
+
+{% endblock %}
