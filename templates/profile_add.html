@@ -1,0 +1,92 @@
+{% extends 'layout.html' %}
+
+{% block title %}Add Profile{% endblock %}
+
+{% block content %}
+<div>
+    <h2>Add Profile</h2> 
+    <p></p>
+    <a href="profile?id={{account[0]}}" class="input-lg text-center btn btn-primary btn-sm">View Profile</a>
+    <a href="password_reset?id={{account[0]}}" class="input-lg text-center btn btn-primary btn-sm">Reset Password</a>
+</div>
+
+
+<div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th class="text-center" width="300"></th>
+                <th class="text-center" width="1000"></th>
+            </tr>
+        </thead>
+        <tbody>
+            
+        <form id="add_form" name="add_form" action="/profile_add" method="post" enctype="multipart/form-data" autocomplete="off">
+            <tr>
+                <td> 
+                    <input type="submit" value="Add" class="btn btn-primary btn-bg" data-toggle="modal" data-target="#myModal"/>
+                    <a href="profile_list?role=Controller" class="input-lg text-center btn btn-primary btn-sm">Manage Controllers</a>
+                    <a href="profile_list?role=Staff" class="input-lg text-center btn btn-primary btn-sm">Manage Staff</a>
+                </td>
+            </tr>
+
+            <tr>
+                <td>User Name:</td>
+                <td><input type="text" value="" name="username" placeholder="Input username here"/></td>
+            </tr>
+            <tr>
+                <td>User Position:</td>
+                <td><input type="text" value="" name="position" placeholder="Input position here"/></td>
+                <select name="position" id="position">
+
+                        <option selected>&lt;Select a position&gt;</option>
+
+                        <option value="" selected> </option>
+                    {% endif %}
+        
+                </select>
+
+            </tr>
+            <tr>
+                <td>First Name:</td>
+                <td><input type="text" value="" name="firstname" placeholder="Input first name here"/></td>
+            </tr>
+            <tr>
+                <td>Last Name:</td>
+                <td><input type="text" value="" name="lastname" placeholder="Input last name here"/></td>
+            </tr>
+            <tr>
+                <td>Email:</td>
+                <td><input type="email" value="" name="email" placeholder="Input email here"/></td>
+            </tr>
+            <tr>
+                <td>Address:</td>
+                <td><input type="text" value="" name="address" placeholder="Input address here"/></td>
+            </tr>
+            <tr>
+                <td>Phone:</td>
+                <td><input type="text" value="" name="phone" placeholder="Input phone here"/></td>
+            </tr>
+            <tr>
+                <td>Date Joined or Hired:</td>
+                <td><input type="text" value="" name="firstname" placeholder="Input first here"/></td>
+            </tr>
+            <tr>
+                <td>Department:</td>
+                <td><input type="text" value="" name="firstname" placeholder="Input first here"/></td>
+            </tr>
+            <tr>
+                <td>Status:</td>
+                <td>{{ account[9] }}</td>
+            </tr>
+            
+            <tr>
+                <td> <input type="submit" value="Add" class="btn btn-primary btn-bg" data-toggle="modal" data-target="#myModal"/></td>
+            </tr>
+        </form>
+    </tbody>
+    </table>
+
+</div>
+{% endblock %}
