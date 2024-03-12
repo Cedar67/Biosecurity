@@ -4,10 +4,14 @@
 
 {% block content %}
 <div>
-    <h2>Profile</h2>
+    {% if id == seesionId %}
+        <h2>View Profile - For Your Own Account</h2> 
+    {% elif id != seesionId %}
+        <h2>View Profile - For Other Account ID={{ account[0] }}</h2> 
+    {% endif %}
     <p></p>
-    <a href="{{ url_for('profile_edit') }}" class="input-lg text-center btn btn-primary btn-sm">Edit Profile</a>
-    <a href="{{ url_for('password_reset') }}" class="input-lg text-center btn btn-primary btn-sm">Reset Password</a>
+    <a href="profile_edit?id={{account[0]}}" class="input-lg text-center btn btn-primary btn-sm">Edit Profile</a>
+    <a href="password_reset?id={{account[0]}}" class="input-lg text-center btn btn-primary btn-sm">Reset Password</a>
 </div>
 
 <div>
