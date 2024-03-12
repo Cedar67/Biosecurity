@@ -10,7 +10,7 @@
 <div>
 
     {% if msg[0] == 1 %}
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
         <strong>{{ msg[1] }}</strong>
     </div>
     {% elif msg[0] == 0 %}
@@ -18,23 +18,22 @@
         <strong>{{ msg[1] }}</strong>
     </div>
     {% endif %}
-    
+
+    <form id="form" name="form" action="/guide_edit?id={{details[0]}}" method="post">
+
+        <input type="submit" value="Save" class="btn btn-primary btn-bg" data-toggle="modal" data-target="#myModal"/>
+        <a href="guide_delete?id={{details[0]}}" class="btn btn-primary btn-bg" data-toggle="modal" data-target="#myModal">Delete</a>
+        <a href="guide_manage" class="btn btn-primary btn-bg" data-toggle="modal" data-target="#myModal">List View</a>
+
     <table>
         <thead>
             <tr>
-                <th class="text-center" width="260"></th>
-                <th class="text-center" width="600"></th>
+                <th class="text-center" width="70%"></th>
+                <th class="text-center" width="30%"></th>
             </tr>
         </thead>
         <tbody>
-        <form id="form" name="form" action="/guide_edit?id={{details[0]}}" method="post">
-            <tr>
-                <td> 
-                    <input type="submit" value="Save" class="btn btn-primary btn-bg" data-toggle="modal" data-target="#myModal"/>
-                    <a href="guide_delete?id={{details[0]}}" class="btn btn-primary btn-bg" data-toggle="modal" data-target="#myModal">Delete</a>
-                    <a href="guide_manage" class="btn btn-primary btn-bg" data-toggle="modal" data-target="#myModal">List View</a>
-                </td>
-            </tr>
+
             
             <tr>
                 <td>Common Name:</td> <td><input type="text" value="{{ details[1] }}" name="common_name" placeholder="Input first name here"/></td>
@@ -64,12 +63,14 @@
             <tr>
                 <td>Control Methods:</td> <td><input type="text" value="{{ details[9] }}" name="control_methods" placeholder="Input first name here"/></td>
             </tr>
+            <tr></tr>
             <tr>
                 <td>Images-1:</td> 
                 <td class="text-center">
                     <img src="data:;base64,{{ image1 }}" >
                 </td>
             </tr>
+            <p>
             <tr>
                 <td>Images-2:</td> 
                 <td class="text-center">
@@ -77,9 +78,9 @@
                 </td>
             </tr>
 
-    </form>
     </tbody>
     </table>
+</form>
     
     <p></p>
         {% if msg[0] == 1 %}

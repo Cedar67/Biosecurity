@@ -80,18 +80,6 @@
         </form>
     </tbody>
     </table>
-    
-    <p></p>
-        {% if msg[0] == 1 %}
-        <br>
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <strong>{{ msg[1] }}</strong>
-        </div>
-        {% elif msg[0] == 0 %}
-        <br>
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <strong>{{ msg[1] }}</strong>
-        </div>
-        {% endif %}
+
 </div>
 {% endblock %}
