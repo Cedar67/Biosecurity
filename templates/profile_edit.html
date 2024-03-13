@@ -17,7 +17,16 @@
 
 
 <div>
-    
+    {% if msg[0] == 1 %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>{{ msg[1] }}</strong>
+    </div>
+    {% elif msg[0] == 0 %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>{{ msg[1] }}</strong>
+    </div>
+    {% endif %}
+
     <table>
         <thead>
             <tr>
@@ -34,11 +43,33 @@
             </tr>
             <tr>
                 <td>User Name:</td>
+                {% if role == "Administrator" %}
+                <td><input type="text" value="{{ account[10] }}" name="username" placeholder="Input username here" required/></td>
+                {% else %}
                 <td>{{ account[10] }}</td>
+                {% endif %}
             </tr>
             <tr>
                 <td>User Position:</td>
+                {% if role == "Administrator" %}
+                <td><select name="position" id="position" required>
+                    {% if account[7] == "Pest Controller" %}
+                        <option value="Pest Controller" selected>Pest Controller</option>
+                        <option value="Staff">Staff</option>
+                        <option value="Administrator">Administrator</option>
+                    {% elif account[7] == "Staff" %}
+                        <option value="Staff" selected>Staff</option>
+                        <option value="Pest Controller">Pest Controller</option>
+                        <option value="Administrator">Administrator</option>
+                    {% elif account[7] == "Administrator" %}
+                        <option value="Staff">Staff</option>
+                        <option value="Pest Controller">Pest Controller</option>
+                        <option value="Administrator" selected>Administrator</option>
+                    {% endif %}
+                </select></td>
+                {% else %}
                 <td>{{ account[7] }}</td>
+                {% endif %}
             </tr>
             <tr>
                 <td>First Name:</td>
@@ -62,15 +93,49 @@
             </tr>
             <tr>
                 <td>Date Joined or Hired:</td>
+                {% if role == "Administrator" %}
+                <td><input type="text" value="{{ account[6] }}" name="datejoined" placeholder="Input date joined here"/></td>
+                {% else %}
                 <td>{{ account[6] }}</td>
+                {% endif %}
             </tr>
             <tr>
                 <td>Department:</td>
+                {% if role == "Administrator" %}
+                <td><select name="department" id="department" required>
+                    {% if account[8] == "Controller" %}
+                        <option value="Controller" selected>Controller</option>
+                        <option value="Staff">Staff</option>
+                        <option value="Administrator">Administrator</option>
+                    {% elif account[8] == "Staff" %}
+                        <option value="Staff" selected>Staff</option>
+                        <option value="Controller">Controller</option>
+                        <option value="Administrator">Administrator</option>
+                    {% elif account[8] == "Administrator" %}
+                        <option value="Staff">Staff</option>
+                        <option value="Controller">Controller</option>
+                        <option value="Administrator" selected>Administrator</option>
+                    {% endif %}
+                </select></td>
+                {% else %}
                 <td>{{ account[8] }}</td>
+                {% endif %}
             </tr>
             <tr>
                 <td>Status:</td>
+                {% if role == "Administrator" %}
+                <td><select name="status" id="status" required>
+                    {% if account[9] == "Inactive" %}
+                        <option value="Inactive" selected>Inactive</option>
+                        <option value="Active">Active</option>
+                    {% elif account[8] == "Active" %}
+                    <option value="Inactive">Inactive</option>
+                    <option value="Active" selected>Active</option>
+                    {% endif %}
+                </select></td>
+                {% else %}
                 <td>{{ account[9] }}</td>
+                {% endif %}
             </tr>
             
             <tr>

@@ -95,7 +95,6 @@ def add_image():
     return render_template('add_image.html')
 
 
-
 # http://localhost:5000/login/ - this will be the login page, we need to use both GET and POST requests
 @app.route('/login/', methods=['GET', 'POST'])
 def login():
@@ -152,7 +151,7 @@ def login():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     # Output message if something goes wrong...
-    msg = ''
+    msg = []
     # Check if "username", "password" and "email" POST requests exist (user submitted form)
     if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email' in request.form:
         # Create variables for easy access
@@ -174,27 +173,27 @@ def register():
         account = cursor.fetchone()
         # If account exists show error and validation checks
         if account:
-            msg = 'Account already exists!'
+            msg = [0,'Account already exists! Please input another username.' ] 
         elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
-            msg = 'Invalid email address!'
+            msg = [0,'Invalid email address!']
         elif not re.match(r'[A-Za-z0-9]+', username):
-            msg = 'Username must contain only characters and numbers!'
+            msg = [0,'Username must contain only characters and numbers!']
         elif not username or not password or not email:
-            msg = 'Please fill out the form!'
+            msg = [0,'Please fill out the form!']
         elif len(password) < 8:
-            msg = 'Please enter a password greater than or equal to 8 characters in length!'
+            msg = [0,'Please enter a password greater than or equal to 8 characters in length!']
         else:
             # Account doesnt exists and the form data is valid, now insert new account into accounts table
             hashed = hashing.hash_value(password, salt='abcd')
             cursor.execute('INSERT INTO secureaccount VALUES (NULL, %s, %s, %s)', (username, hashed, email,))
             cursor.execute('INSERT INTO profile VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s)', parameters)
             connection.commit()
-            msg = 'You have successfully registered!'
+            msg = [1,'You have successfully registered!']
             cursor.close()
             connection.close()
     elif request.method == 'POST':
         # Form is empty... (no POST data)
-        msg = 'Please fill out the form!'
+        msg = [0,'Please fill out the form!']
     # Show registration form with message (if any)
     return render_template('register.html', msg=msg)
 
@@ -525,7 +524,8 @@ def profile_edit():
                         WHERE secureaccount.id = %s"""
             cursor.execute(sql, (id,))
             account = cursor.fetchone()
-            return render_template('profile_edit.html', account=account, id=id, seesionId = session['id'])
+            return render_template('profile_edit.html', account=account, id=id, seesionId = session['id'], role = session['role'], msg=msg)
+        
         elif request.method == "POST":
             # Check if "firstname", "lastname" and "email" POST requests exist (user submitted form)
             if 'firstname' in request.form and 'lastname' in request.form and 'email' in request.form and 'address' in request.form and 'phone' in request.form:
@@ -536,32 +536,64 @@ def profile_edit():
                 address = request.form['address']
                 phone = request.form['phone']
 
+                if session['role'] == "Administrator":
+                    inputprofile = []
+                    username = request.form['username']
+                    position = request.form['position']
+                    department = request.form['department']
+                    status = request.form['status']
+                    datejoined = request.form['datejoined']
+                    inputprofile = [id, firstname, lastname, email, address, phone, datejoined, position, department, status, username]
+                    
+                    cursor = getCursor()
+                    cursor.execute('SELECT * FROM secureaccount WHERE username = %s', (username,))
+                    account = cursor.fetchone()
+
+                # If account exists show error and validation checks
+                if account:
+                    msg = [0,'Account (User Name) already exists! Please input another username.']        
                 # Check if 
-                if not re.match(r'[^@]+@[^@]+\.[^@]+', email):
+                elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
                     msg = 'Invalid email address!'
                 else:
                     # Update new profile information into profile table
                     cursor = getCursor()
-                    sql = """   UPDATE profile 
-                                SET first_name = %s, last_name = %s, email = %s, address = %s, phone = %s
-                                WHERE id = %s;"""
-                                
-                    cursor.execute(sql, (firstname, lastname, email, address, phone, id, ))
-                    cursor.fetchall()
 
-                    msg = [1,'You have successfully updated profile information!']
+                    if session['role'] != "Administrator":
+                        sql = """   UPDATE profile 
+                                    SET first_name = %s, last_name = %s, email = %s, address = %s, phone = %s
+                                    WHERE id = %s;"""
+                        cursor.execute(sql, (firstname, lastname, email, address, phone, id, ))
+                        cursor.fetchall()
 
-                    cursor = getCursor()  
-                    sql1 = """   SELECT profile.*, secureaccount.username 
-                                FROM secureaccount 
-                                INNER JOIN profile ON secureaccount.id = profile.id 
-                                WHERE secureaccount.id = %s"""
-                    cursor.execute(sql1, (id,))
-                    account = cursor.fetchone()
+                        msg = [1,'You have successfully updated profile information!']
+
+                        cursor = getCursor()  
+                        sql1 = """   SELECT profile.*, secureaccount.username 
+                                    FROM secureaccount 
+                                    INNER JOIN profile ON secureaccount.id = profile.id 
+                                    WHERE secureaccount.id = %s"""
+                        cursor.execute(sql1, (id,))
+                        account = cursor.fetchone()
+                        
+                        cursor.close()
+                        connection.close()   
+                        return render_template('profile_details.html', msg=msg, account=account, id=id, seesionId = session['id'])
+                    else:
+                        sql1 = """  UPDATE profile 
+                                    SET first_name = %s, last_name = %s, email = %s, address = %s, phone = %s, date_joined = %s, position = %s, department = %s, status = %s
+                                    WHERE id = %s;"""            
+                        cursor.execute(sql1, (firstname, lastname, email, address, phone, datejoined, position, department, status, id,))        
+                        cursor.execute('UPDATE secureaccount SET username = %s, email = %s WHERE id = %s', (username, email, id,))
+                        
+                        message = 'You have successfully updated '+ department +' user ( User Name: '+ username +' ) information!'
+                        msg = [1, message]
+     
+                        cursor.close()
+                        connection.close()   
+                        return redirect(url_for('profile_list',role=department, msgCode=msg[0], msgContent=msg[1]))
                     
-                    cursor.close()
-                    connection.close()   
-                    return render_template('profile_details.html', msg=msg, account=account, id=id, seesionId = session['id'])
+                return render_template('profile_edit.html', account=inputprofile, id=id, seesionId = session['id'], role = session['role'], msg=msg)
             else:
                 # Form is empty... (no POST data)
                 msg = 'Please fill out the form!'
@@ -642,7 +674,7 @@ def profile_add():
                     account = cursor.fetchone()
                     # If account exists show error and validation checks
                     if account:
-                        msg = [0,'Account (User Name) already exists!']
+                        msg = [0,'Account (User Name) already exists! Please input another username.']
                     # Check if email address is valid
                     elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
                         msg = [0,'Invalid email address!']
