@@ -5,13 +5,38 @@
 {% block content %}
 <div>
     {% if id == seesionId %}
-        <h2>View Profile - For Your Own Account</h2> 
+        <h2>View Profile - Your Own Account</h2> 
     {% elif id != seesionId %}
-        <h2>View Profile - For Other Account ID={{ account[0] }}</h2> 
+        <h2>View Profile - Other Account ID = {{ account[0] }}</h2> 
     {% endif %}
-    <p></p>
-    <a href="profile_edit?id={{account[0]}}" class="input-lg text-center btn btn-primary btn-sm">Edit Profile</a>
-    <a href="password_reset?id={{account[0]}}" class="input-lg text-center btn btn-primary btn-sm">Reset Password</a>
+
+    {% if role == "Administrator" %}
+        <p></p>
+        <a href="profile_edit?id={{account[0]}}" class="input-lg text-center btn btn-primary btn-sm">Edit Profile</a>
+        <a href="password_reset?id={{account[0]}}" class="input-lg text-center btn btn-primary btn-sm">Reset Password</a>  
+        <p></p>  
+        <a href="profile_list?role=Controller" class="input-lg text-center btn btn-primary btn-sm">Manage Controllers</a>
+        <a href="profile_list?role=Staff" class="input-lg text-center btn btn-primary btn-sm">Manage Staff</a>
+    {% endif %}
+
+    
+    {% if role == "Staff" %} 
+        <p></p>  
+        {% if id == seesionId %} 
+            <a href="profile_edit?id={{account[0]}}" class="input-lg text-center btn btn-primary btn-sm">Edit Profile</a>
+            <a href="password_reset?id={{account[0]}}" class="input-lg text-center btn btn-primary btn-sm">Reset Password</a>  
+        {% endif %}
+        <p></p>  
+        <a href="{{ url_for('profile_list') }}" class="input-lg text-center btn btn-primary btn-sm">View Controllers List</a>
+    {% endif %}
+
+    {% if role == "Controller" %} 
+        <p></p>  
+        {% if id == seesionId %} 
+            <a href="profile_edit?id={{account[0]}}" class="input-lg text-center btn btn-primary btn-sm">Edit Profile</a>
+            <a href="password_reset?id={{account[0]}}" class="input-lg text-center btn btn-primary btn-sm">Reset Password</a>  
+        {% endif %}
+    {% endif %}
 </div>
 
 <div>

@@ -11,11 +11,12 @@
 <div>
     <h2>Here Are Your Exclusive Features</h2>
     <p></p>
-    <a href="{{ url_for('profile') }}" class="input-lg text-center btn btn-primary btn-sm">View Profile</a>
+    <a href="{{ url_for('profile') }}" class="input-lg text-center btn btn-primary btn-sm">View Your Own Profile</a>
+
+    <a href="{{ url_for('profile_edit') }}" class="input-lg text-center btn btn-primary btn-sm">Edit Your Own Profile</a>
+
+    <a href="{{ url_for('password_reset') }}" class="input-lg text-center btn btn-primary btn-sm">Reset Your Own Password</a>
     <p></p>
-    <a href="{{ url_for('profile_edit') }}" class="input-lg text-center btn btn-primary btn-sm">Edit Profile</a>
-    <p></p>
-    <a href="{{ url_for('password_reset') }}" class="input-lg text-center btn btn-primary btn-sm">Reset Password</a>
     <p></p>
     <a href="{{ url_for('guide_view') }}" class="input-lg text-center btn btn-primary btn-sm">View Guide List</a>
 </div>

@@ -497,7 +497,7 @@ def profile():
                     WHERE secureaccount.id = %s"""
         cursor.execute(sql, (id,))
         account = cursor.fetchone()
-        return render_template('profile_details.html', account=account, msg=msg, id=id, seesionId = session['id'])
+        return render_template('profile_details.html', account=account, msg=msg, id=id, seesionId=session['id'], role=session['role'])
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
 
@@ -594,8 +594,6 @@ def profile_list():
                 roleSQL = ('Controller',)
                 connection.execute(sql, roleSQL)
                 profile_list = connection.fetchall()
-                for list in profile_list:
-                    print(list)
                 return render_template("profile_view.html", profile_list = profile_list)
             
             if session['role'] == "Administrator":
@@ -603,8 +601,6 @@ def profile_list():
                 roleSQL = (role,)
                 connection.execute(sql, roleSQL)
                 profile_list = connection.fetchall()
-                for list in profile_list:
-                    print(list)
                 return render_template("profile_manage.html", profile_list = profile_list, role=role, msg=msg)
 
     # User is not loggedin redirect to login page
