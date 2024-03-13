@@ -494,8 +494,8 @@ def guide_manage():
 
 
 # http://localhost:5000/profile - this will be the profile page, only accessible for loggedin users
-@app.route('/profile', methods=["GET","POST"])
-def profile():
+@app.route('/profile_details', methods=["GET","POST"])
+def profile_details():
     # Check if user is loggedin
     if 'loggedin' in session:
         # Output message to Webpage
@@ -722,6 +722,40 @@ def profile_add():
             
                 return render_template('profile_add.html', inputprofile=inputprofile, msg=msg)
 
+    # User is not loggedin redirect to login page
+    return redirect(url_for('login'))
+
+
+@app.route('/profile_delete', methods=["GET","POST"])
+def profile_delete():
+    # Check if user is loggedin
+    if 'loggedin' in session:
+        if session['role'] == "Administrator":
+            # Output message to Webpage
+            msg = [-1,""]
+            
+            id = request.args.get('id')
+
+            # We need all the account info for the user so we can display it on the profile page
+            cursor = getCursor()   
+            sql = """   SELECT profile.*, secureaccount.username 
+                        FROM secureaccount 
+                        INNER JOIN profile ON secureaccount.id = profile.id 
+                        WHERE secureaccount.id = %s"""
+            cursor.execute(sql, (int(id),))
+            account = cursor.fetchone()
+            
+            # Delete this user in database
+            cursor = getCursor()   
+            sql = """   DELETE FROM profile 
+                        WHERE id = %s"""
+            cursor.execute(sql, (int(id),))
+            sql = """   DELETE FROM secureaccount 
+                        WHERE id = %s"""
+            cursor.execute(sql, (int(id),))
+
+            msg = [1,'You have deleted this user profile successfully!']
+            return render_template('profile_details.html', account=account, id=id, seesionId = session['id'], role = session['role'], msg=msg)
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
 
