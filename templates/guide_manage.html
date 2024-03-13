@@ -15,15 +15,16 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th class="text-center" width="50"></th>
-                <th class="text-center" width="500">Common Name</th>
-                <th class="text-center" width="50"></th>
-                <th class="text-center" width="2000">Primary Image</th>
-                <th class="text-center" width="50"></th>
-                <th class="text-center" width="50"></th>
-                <th class="text-center" width="50"></th>
-                <th class="text-center" width="50"></th>
-                <th class="text-center" width="50"></th>
+                <th class="text-center" width="10%">Guide ID</th>
+                <th class="text-center" width="15%">Common Name</th>
+                <th class="text-center" width="15%">Scientific Name</th>
+                <th class="text-center" width="10%"></th>
+                <th class="text-center" width="20%">Primary Image</th>
+                <th class="text-center" width="5%"></th>
+                <th class="text-center" width="5%"></th>
+                <!-- <th class="text-center" width="50"></th> -->
+                <th class="text-center" width="5%"></th>
+                <th class="text-center" width="5%"></th>
             </tr>
             <!-- <style>img{width:200px;height:200px;}</style> -->
 
@@ -31,14 +32,15 @@
         <tbody>
         {% for guide in guide_list %}
             <tr>
-            <form id="form" name="edit_form" action="/runedit/update" method="post">
-                <td><input type="hidden" value="" name="" class="form-control input-sm"></td>
+            <form id="form" name="edit_form" action="" method="post">
+                <td class="text-center">{{guide[0]}}</td>
                 <td class="text-center">{{guide[1]}}</td>
+                <td class="text-center">{{guide[2]}}</td>
                 <td><input type="hidden" value="" name="" class="form-control input-sm"></td>
-                <td> <a href="guide_details?id={{guide[0]}}"><img src="data:;base64,{{ guide[2] }}" class="form-control"></a></td>
+                <td> <a href="guide_details?id={{guide[0]}}"><img src="data:;base64,{{ guide[3] }}" class="form-control"></a></td>
                 <td><input type="hidden" value="" name="" class="form-control input-sm"></td>
                 <td> <a href="guide_details?id={{guide[0]}}" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal">View</a></td>
-                <td><input type="hidden" value="" name="" class="form-control input-sm"></td>
+                <!-- <td><input type="hidden" value="" name="" class="form-control input-sm"></td> -->
                 <td> <a href="guide_edit?id={{guide[0]}}" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal">Edit</a></td>
                 <td><input type="hidden" value="" name="" class="form-control input-sm"></td>
             </form>

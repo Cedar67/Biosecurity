@@ -19,7 +19,7 @@
     </div>
     {% endif %}
 
-    <form id="form" name="form" action="/guide_edit?id={{details[0]}}" method="post">
+    <form id="form" name="form" action="/guide_edit?id={{details[0]}}" method="post" enctype="multipart/form-data" autocomplete="off">
 
         <input type="submit" value="Save" class="btn btn-primary btn-bg" data-toggle="modal" data-target="#myModal"/>
         <a href="guide_delete?id={{details[0]}}" class="btn btn-primary btn-bg" data-toggle="modal" data-target="#myModal">Delete</a>
@@ -28,8 +28,8 @@
     <table>
         <thead>
             <tr>
-                <th class="text-center" width="70%"></th>
                 <th class="text-center" width="30%"></th>
+                <th class="text-center" width="70%"></th>
             </tr>
         </thead>
         <tbody>
@@ -68,6 +68,8 @@
                 <td>Images-1:</td> 
                 <td class="text-center">
                     <img src="data:;base64,{{ image1 }}" >
+                    <p><p>
+                    <input class="form-control" type="file" name="photo1" placeholder="Photo" id="photo1">
                 </td>
             </tr>
             <p>
@@ -75,8 +77,25 @@
                 <td>Images-2:</td> 
                 <td class="text-center">
                     <img src="data:;base64,{{ image2 }}" >
+                    <p><p>
+                    <input class="form-control" type="file" name="photo2" placeholder="Photo" id="photo2">
                 </td>
             </tr>
+
+
+            <!-- <tr>
+                <td>Images-1:</td> 
+				<td><input class="form-control" type="file" name="photo1" placeholder="Photo" id="photo1"></td>
+            </tr>
+            <tr>
+                <td>Images-2:</td> 
+				<td><input class="form-control" type="file" name="photo2" placeholder="Photo" id="photo2"></td>
+            </tr> -->
+            <tr>
+                <td></td> 
+				<td><p class="help-block">Support jpeg, png, gif format, size no more than 5 MByte</p></td>
+            </tr>
+
 
     </tbody>
     </table>

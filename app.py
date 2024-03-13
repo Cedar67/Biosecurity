@@ -349,14 +349,33 @@ def guide_edit():
                     impact = request.form['impact']
                     control_methods = request.form['control_methods']
 
+
+                    picture1 = request.files['photo1']
+                    image1 = picture1.read()
+                    picture1.close()
+                    
+                    picture2 = request.files['photo2']
+                    image2 = picture2.read()
+                    picture2.close()
+
                     # Update new guide details information into profile table
                     cursor = getCursor()
-                    sql = """   UPDATE guide 
+                    sql1 = """   UPDATE guide 
                                 SET common_name = %s, scientific_name = %s, description = %s, distribution = %s, size = %s, droppings = %s, footprints = %s, impact = %s, control_methods = %s
-                                WHERE id = %s;"""
-                                
-                    cursor.execute(sql, (common_name, scientific_name, description, distribution, size, droppings, footprints, impact, control_methods, id, ))
-                    cursor.fetchall()
+                                WHERE id = %s;""" 
+                    cursor.execute(sql1, (common_name, scientific_name, description, distribution, size, droppings, footprints, impact, control_methods, id, ))
+                    # print("image1  "+picture2.filename)
+                    if picture1.filename !='' and picture2.filename !='':
+                        sql2 = """   UPDATE guide SET image1 = %s, image2 = %s WHERE id = %s;"""
+                        cursor.execute(sql2, (image1, image2, id, ))
+
+                    elif picture1.filename !='' and picture2.filename =='':
+                        sql3 = """   UPDATE guide  SET image1 = %s WHERE id = %s;"""
+                        cursor.execute(sql3, (image1, id, ))
+
+                    elif picture1.filename =='' and picture2.filename !='':
+                        sql4 = """   UPDATE guide SET image2 = %s WHERE id = %s;"""
+                        cursor.execute(sql4, (image2, id, ))
 
                     msg = [1,'You have updated this guide details successfully!']
 
@@ -454,16 +473,16 @@ def guide_manage():
 
             if request.method == "GET":
                 cursor = getCursor()   
-                cursor.execute("SELECT id,common_name,image1 FROM guide;")
+                cursor.execute("SELECT id,common_name,scientific_name,image1 FROM guide;")
                 guide_touple = cursor.fetchall()
                 guide_list = []
                 # Convert binary blob data to base64 encoding
                 for guide in guide_touple:
                     i=0
                     guideUpdate = [] 
-                    for i in range(0, 3):
-                        if i == 2:
-                            guideUpdate.append(base64.b64encode(guide[2]).decode('utf-8'))
+                    for i in range(0, 4):
+                        if i == 3:
+                            guideUpdate.append(base64.b64encode(guide[3]).decode('utf-8'))
                         guideUpdate.append(guide[i])
                     guide_list.append(guideUpdate)
 
