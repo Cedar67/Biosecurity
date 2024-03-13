@@ -33,55 +33,66 @@
         <form id="add_form" name="add_form" action="/profile_add" method="post" enctype="multipart/form-data" autocomplete="off">
             <tr>
                 <td>User Name:</td>
-                <td><input type="text" value="" name="username" placeholder="Input username here" required/></td>
+                <td><input type="text" value="{{inputprofile[0]}}" name="username" placeholder="Input username here" required/></td>
             </tr>
             <tr>
                 <td>Password:</td>
-                <td><input type="text" value="" name="password" placeholder="Input password here" required/></td>
+                <td><input type="text" value="{{inputprofile[10]}}" name="password" placeholder="Input password here" required/></td>
             </tr>
             <tr>
                 <td>User Position:</td>
                 <td>
                 <select name="position" id="position" required>
-                    <option selected> &lt;Select a position&gt;</option>
-                    <option value="Pest Controller">Pest Controller</option>
-                    <option value="Staff">Staff</option>
-                    <option value="Administrator">Administrator</option>
+                    {% if role == "Controller" %}
+                        <option value="Pest Controller" selected>Pest Controller</option>
+                        <option value="Staff">Staff</option>
+                        <option value="Administrator">Administrator</option>
+                    {% else %}
+                        <option value="Staff" selected>Staff</option>
+                        <option value="Pest Controller">Pest Controller</option>
+                        <option value="Administrator">Administrator</option>
+                    {% endif %}
+
                 </select>
                 </td>
             </tr>
             <tr>
                 <td>First Name:</td>
-                <td><input type="text" value="" name="firstname" placeholder="Input first name here"/></td>
+                <td><input type="text" value="{{inputprofile[1]}}" name="firstname" placeholder="Input first name here"required/></td>
             </tr>
             <tr>
                 <td>Last Name:</td>
-                <td><input type="text" value="" name="lastname" placeholder="Input last name here"/></td>
+                <td><input type="text" value="{{inputprofile[2]}}" name="lastname" placeholder="Input last name here"required/></td>
             </tr>
             <tr>
                 <td>Email:</td>
-                <td><input type="email" value="" name="email" placeholder="Input email here" required/></td>
+                <td><input type="email" value="{{inputprofile[3]}}" name="email" placeholder="Input email here" required/></td>
             </tr>
             <tr>
                 <td>Address:</td>
-                <td><input type="text" value="" name="address" placeholder="Input address here"/></td>
+                <td><input type="text" value="{{inputprofile[4]}}" name="address" placeholder="Input address here" required/></td>
             </tr>
             <tr>
                 <td>Phone:</td>
-                <td><input type="text" value="" name="phone" placeholder="Input phone here"/></td>
+                <td><input type="text" value="{{inputprofile[5]}}" name="phone" placeholder="Input phone here" required/></td>
             </tr>
             <tr>
                 <td>Date Joined or Hired:</td>
-                <td><input type="text" value="" name="datejoined" placeholder="Input date joined here" required/></td>
+                <td><input type="text" value="{{inputprofile[6]}}" name="datejoined" placeholder="Input date joined here" required/></td>
             </tr>
             <tr>
                 <td>Department:</td>
                 <td>
                 <select name="department" id="department" required>
-                    <option selected>&lt;Select a department&gt;</option>
-                    <option value="Controller">Controller</option>
-                    <option value="Staff">Staff</option>
-                    <option value="Administrator">Administrator</option>
+                    {% if role == "Controller" %}
+                        <option value="Controller" selected>Controller</option>
+                        <option value="Staff">Staff</option>
+                        <option value="Administrator">Administrator</option>
+                    {% else %}
+                        <option value="Staff" selected>Staff</option>
+                        <option value="Controller">Controller</option>
+                        <option value="Administrator">Administrator</option>
+                    {% endif %}
                 </select>
                 </td>
             </tr>

@@ -575,7 +575,11 @@ def profile_edit():
 def profile_list():
 
     # Output message to Webpage
-    msg = [-1,""]
+    if request.args.get('msgCode') == "1" or request.args.get('msgCode') == "0":
+        msg = [int(request.args.get('msgCode')), request.args.get('msgContent')]
+    else:
+        msg = [-1,""]
+    
     if 'loggedin' in session :
         if session['role'] == "Staff" or session['role'] == "Administrator":
             
@@ -612,11 +616,12 @@ def profile_add():
     # Check if user is loggedin
     if 'loggedin' in session:
         if session['role'] == "Administrator":
-
+            inputprofile = []
             # Output message to Webpage
             msg = [-1,""]
             if request.method == "GET":
-                return render_template('profile_add.html', msg=msg)
+                role = request.args.get('role')
+                return render_template('profile_add.html', inputprofile=inputprofile, msg=msg, role=role)
             
             elif request.method == "POST":
                 # Check if "firstname", "lastname" and "email" POST requests exist (user submitted form)
@@ -634,14 +639,14 @@ def profile_add():
                     phone = request.form['phone']
                     password = request.form['password']
                     hashed = hashing.hash_value(password, salt='abcd')
-            
+                    inputprofile = [username,firstname, lastname, email, address, phone, datejoined, position, department, status, password]
                     # Check if account exists using MySQL
                     cursor = getCursor()
                     cursor.execute('SELECT * FROM secureaccount WHERE username = %s', (username,))
                     account = cursor.fetchone()
                     # If account exists show error and validation checks
                     if account:
-                        msg = 'Account already exists!'
+                        msg = [0,'Account (User Name) already exists!']
                     # Check if email address is valid
                     elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
                         msg = [0,'Invalid email address!']
@@ -654,28 +659,21 @@ def profile_add():
                     else:
                         # Add new profile information into profile table
                         cursor = getCursor()
-                        sql1 = """   INSERT INTO profile VALUES (NULL,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""              
+                        sql1 = """   INSERT INTO profile VALUES (NULL,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""              
                         cursor.execute(sql1, (firstname, lastname, email, address, phone, datejoined, position, department, status,))        
                         cursor.execute('INSERT INTO secureaccount VALUES (NULL, %s, %s, %s)', (username, hashed, email,))
-                        cursor.fetchall()
-
-                        msg = [1,'You have successfully updated profile information!']
-
-                        # cursor = getCursor()  
-                        # sql1 = """   SELECT profile.*, secureaccount.username 
-                        #             FROM secureaccount 
-                        #             INNER JOIN profile ON secureaccount.id = profile.id 
-                        #             WHERE secureaccount.id = %s"""
-                        # cursor.execute(sql1, (id,))
-                        # account = cursor.fetchone()
                         
+                        message = 'You have successfully added a new '+ department +' user ( User Name: '+ username +' ) information!'
+                        msg = [1, message]
+     
                         cursor.close()
                         connection.close()   
-                        return redirect(url_for('profile_list',role=department, msg=msg))
+                        return redirect(url_for('profile_list',role=department, msgCode=msg[0], msgContent=msg[1]))
                 else:
                     # Form is empty... (no POST data)
                     msg = [0,'Please fill out the form!']
-                    return render_template('profile_add.html', msg=msg)
+            
+                return render_template('profile_add.html', inputprofile=inputprofile, msg=msg)
 
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
