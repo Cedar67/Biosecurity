@@ -311,7 +311,6 @@ def guide_view():
     return redirect(url_for('login'))
 
 
-
 @app.route('/guide_edit', methods=["GET","POST"])
 def guide_edit():
     # Check if user is loggedin
@@ -574,7 +573,9 @@ def profile_edit():
 # http://localhost:5000/profile_list - this will be the profile page, only accessible for loggedin users - Staff and Administrator
 @app.route('/profile_list', methods=["GET"])
 def profile_list():
-    
+
+    # Output message to Webpage
+    msg = [-1,""]
     if 'loggedin' in session :
         if session['role'] == "Staff" or session['role'] == "Administrator":
             
@@ -600,7 +601,81 @@ def profile_list():
                 profile_list = connection.fetchall()
                 for list in profile_list:
                     print(list)
-                return render_template("profile_manage.html", profile_list = profile_list, role=role)
+                return render_template("profile_manage.html", profile_list = profile_list, role=role, msg=msg)
+
+    # User is not loggedin redirect to login page
+    return redirect(url_for('login'))
+
+
+@app.route('/profile_add', methods=["GET","POST"])
+def profile_add():
+    # Check if user is loggedin
+    if 'loggedin' in session:
+        if session['role'] == "Administrator":
+
+            # Output message to Webpage
+            msg = [-1,""]
+            if request.method == "GET":
+                return render_template('profile_add.html', msg=msg)
+            
+            elif request.method == "POST":
+                # Check if "firstname", "lastname" and "email" POST requests exist (user submitted form)
+                if 'username' in request.form and 'position' in request.form and 'department' in request.form and 'email' in request.form:
+                    # Get new Value from user
+                    username = request.form['username']
+                    position = request.form['position']
+                    department = request.form['department']
+                    status = request.form['status']
+                    datejoined = request.form['datejoined']
+                    firstname = request.form['firstname']
+                    lastname = request.form['lastname']
+                    email = request.form['email']
+                    address = request.form['address']
+                    phone = request.form['phone']
+                    password = request.form['password']
+                    hashed = hashing.hash_value(password, salt='abcd')
+            
+                    # Check if account exists using MySQL
+                    cursor = getCursor()
+                    cursor.execute('SELECT * FROM secureaccount WHERE username = %s', (username,))
+                    account = cursor.fetchone()
+                    # If account exists show error and validation checks
+                    if account:
+                        msg = 'Account already exists!'
+                    # Check if email address is valid
+                    elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
+                        msg = [0,'Invalid email address!']
+                    elif not re.match(r'[A-Za-z0-9]+', username):
+                        msg = [0,'Username must contain only characters and numbers!']
+                    elif not username or not password or not email:
+                        msg = 'Please fill out the form!'
+                    elif len(password) < 8:
+                        msg = [0,'Please enter a password greater than or equal to 8 characters in length!']
+                    else:
+                        # Add new profile information into profile table
+                        cursor = getCursor()
+                        sql1 = """   INSERT INTO profile VALUES (NULL,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""              
+                        cursor.execute(sql1, (firstname, lastname, email, address, phone, datejoined, position, department, status,))        
+                        cursor.execute('INSERT INTO secureaccount VALUES (NULL, %s, %s, %s)', (username, hashed, email,))
+                        cursor.fetchall()
+
+                        msg = [1,'You have successfully updated profile information!']
+
+                        # cursor = getCursor()  
+                        # sql1 = """   SELECT profile.*, secureaccount.username 
+                        #             FROM secureaccount 
+                        #             INNER JOIN profile ON secureaccount.id = profile.id 
+                        #             WHERE secureaccount.id = %s"""
+                        # cursor.execute(sql1, (id,))
+                        # account = cursor.fetchone()
+                        
+                        cursor.close()
+                        connection.close()   
+                        return redirect(url_for('profile_list',role=department, msg=msg))
+                else:
+                    # Form is empty... (no POST data)
+                    msg = [0,'Please fill out the form!']
+                    return render_template('profile_add.html', msg=msg)
 
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))

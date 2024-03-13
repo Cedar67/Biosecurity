@@ -10,6 +10,19 @@
     <h2>Manage {{role}} Profile</h2>
     <p></p>
 
+    {% if msg[0] == 1 %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>{{ msg[1] }}</strong>
+    </div>
+    {% elif msg[0] == 0 %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>{{ msg[1] }}</strong>
+    </div>
+    {% endif %}
+
+    <a href="profile_add" class="btn btn-primary btn-bg" data-toggle="modal" data-target="#myModal">Add User</a>
+    <p></p>
+
     <table class="table table-sm">
         <thead>
             <tr>
