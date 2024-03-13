@@ -40,26 +40,8 @@ def getCursor():
     dbconn = connection.cursor()
     return dbconn
 
-def uploadPicture(picturePath):
 
-    picture = open(picturePath, 'rb')
-    pictureByte = picture.read()
-    picture.close()
-    return pictureByte
-
-
-@app.route('/')
-def index():
-    
-    # Check if user is loggedin
-    if 'loggedin' in session:
-        # User is loggedin show them the home page
-        return render_template('home.html', username=session['username'])
-    # User is not loggedin redirect to login page
-    return redirect(url_for('login'))
-
-
-# http://localhost:5000/register - this will be the registration page, we need to use both GET and POST requests
+# It is just a test function. Used for add test image. 
 @app.route('/add_image', methods=['GET','POST'])
 def add_image():
     if request.method == 'POST':
@@ -93,6 +75,17 @@ def add_image():
 
     # Show registration form with message (if any)
     return render_template('add_image.html')
+
+
+@app.route('/')
+def index():
+    
+    # Check if user is loggedin
+    if 'loggedin' in session:
+        # User is loggedin show them the home page
+        return render_template('home.html', username=session['username'])
+    # User is not loggedin redirect to login page
+    return redirect(url_for('login'))
 
 
 # http://localhost:5000/login/ - this will be the login page, we need to use both GET and POST requests
@@ -198,7 +191,6 @@ def register():
     return render_template('register.html', msg=msg)
 
 
-
 # http://localhost:5000/home - this will be the home page, only accessible for loggedin users
 @app.route('/home')
 def home():
@@ -236,7 +228,6 @@ def dashboard():
             return render_template('dashboard_admin.html', username=session['username'], role=session['role'], guide_list=guide_list)
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
-
 
 
 @app.route('/guide_details', methods=["GET","POST"])
@@ -621,7 +612,7 @@ def profile_edit():
     return redirect(url_for('login'))
 
 
-# http://localhost:5000/profile_list - this will be the profile page, only accessible for loggedin users - Staff and Administrator
+# http://localhost:5000/profile_list - this will be the profile list page, only accessible for - Staff and Administrator
 @app.route('/profile_list', methods=["GET"])
 def profile_list():
 
