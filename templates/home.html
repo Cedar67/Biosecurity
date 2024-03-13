@@ -3,6 +3,26 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<h2>User Landing Page</h2>
-<p>Welcome back, {{ username }}!</p>
+<br>
+<h1>Home Page</h1>
+{% if role == "logout" %}
+    <p class="fs-6"><strong>Welcome!  You are not logged in. Please click the button to Login or Register</strong>
+    <a href="login" class="input-lg text-center btn btn-primary btn-sm">Login</a>
+    <a href="register" class="input-lg text-center btn btn-primary btn-sm">Register</a>
+    </p>
+
+{% elif role == "Administrator" %}
+    <p class="fs-6"><strong>Welcome Back, {{ username }}!  You are an {{ role }} in this system.</strong></p>
+    <p class="fs-6"><strong>Please click the button to your Dashboard. </strong>
+    <a href="dashboard" class="input-lg text-center btn btn-primary btn-sm">Dashboard</a>
+    </p>
+
+{% else %}
+    <p class="fs-6"><strong>Welcome Back, {{ username }}!  You are a {{ role }} in this system.</strong></p>
+    <p class="fs-6"><strong>Please click the button to your Dashboard</strong></p>
+    <a href="dashboard" class="input-lg text-center btn btn-primary btn-sm">Dashboard</a>
+    </p>
+
+{% endif %}
+
 {% endblock %}

@@ -83,9 +83,11 @@ def index():
     # Check if user is loggedin
     if 'loggedin' in session:
         # User is loggedin show them the home page
-        return render_template('home.html', username=session['username'])
-    # User is not loggedin redirect to login page
-    return redirect(url_for('login'))
+        return render_template('home.html', username=session['username'], role= session['role'])
+    
+    # User is Non-loggedin show them the home page
+    return render_template('home.html', username="logout", role="logout")
+
 
 
 # http://localhost:5000/login/ - this will be the login page, we need to use both GET and POST requests
@@ -123,7 +125,7 @@ def login():
                     session['role'] = account[4]
                     
                     # Redirect to dashboard page
-                    return redirect(url_for('dashboard'))
+                    return redirect(url_for('home'))
                 else:
                     #password incorrect
                     msg = 'Incorrect password!'
@@ -197,9 +199,9 @@ def home():
     # Check if user is loggedin
     if 'loggedin' in session:
         # User is loggedin show them the home page
-        return render_template('home.html', username=session['username'])
-    # User is not loggedin redirect to login page
-    return redirect(url_for('login'))
+        return render_template('home.html', username=session['username'], role= session['role'])
+    # User is Non-loggedin show them the home page
+    return render_template('home.html', username="logout", role="logout")
 
 
 @app.route('/dashboard')
