@@ -82,7 +82,7 @@ body {
 }
 .navtop {
     background-color: #090c8b;
-    height: 60px;
+    height: 65px;
     width: 100%;
     border: 0;
 }
@@ -98,14 +98,14 @@ body {
 }
 .navtop div h1 {
     flex: 1;
-    font-size: 24px;
+    font-size: 22px;
     padding: 0;
    margin: 0;
     color: #eaebed;
-    font-weight: normal;
+    font-weight: bold;
 }
 .navtop div a {
-    padding: 0 20px;
+    padding: 0 18px;
     text-decoration: none;
     color: #c1c4c8;
     font-weight: bold;
