@@ -586,7 +586,7 @@ def profile_edit():
                 email = request.form['email']
                 address = request.form['address']
                 phone = request.form['phone']
-
+                account = None
                 if session['role'] == "Administrator":
                     inputprofile = []
                     username = request.form['username']
@@ -601,7 +601,7 @@ def profile_edit():
                     account = cursor.fetchone()
 
                 # If account exists show error and validation checks
-                if account:
+                if account != None and account[0] != id:
                     msg = [0,'Account (User Name) already exists! Please input another username.']        
                 # Check if 
                 elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
