@@ -59,13 +59,18 @@ def add_image():
         pictureByte2 = picture2.read()
         picture2.close()
         base64picture2 = base64.b64encode(pictureByte2).decode('utf-8')
+        
+        picture3 = request.files['photo3']
+        pictureByte3 = picture3.read()
+        picture3.close()
+        base64picture3 = base64.b64encode(pictureByte2).decode('utf-8')
 
         cursor = getCursor()
         sql = """   UPDATE guide 
-                    SET image1 = %s, image2 = %s
+                    SET image1 = %s, image2 = %s, image3 = %s
                     WHERE id = %s;"""   
         # cursor.execute(sql, (base64picture1, base64picture2, id, ))
-        cursor.execute(sql, (pictureByte1, pictureByte2, id, ))
+        cursor.execute(sql, (pictureByte1, pictureByte2, pictureByte3, id, ))
         cursor.fetchone()
 
         # connection.commit()
@@ -79,7 +84,6 @@ def add_image():
 
 @app.route('/')
 def index():
-    
     # Check if user is loggedin
     if 'loggedin' in session:
         # User is loggedin show them the home page
@@ -87,7 +91,6 @@ def index():
     
     # User is Non-loggedin show them the home page
     return render_template('home.html', username="logout", role="logout")
-
 
 
 # http://localhost:5000/login/ - this will be the login page, we need to use both GET and POST requests
@@ -177,6 +180,8 @@ def register():
             msg = [0,'Please fill out the form!']
         elif len(password) < 8:
             msg = [0,'Please enter a password greater than or equal to 8 characters in length!']
+        elif not (re.search(r'\d+', password) and (re.search(r'[a-z]+', password) or re.search(r'[A-Z]+', password)) and re.search(r'[!@#$%^&*()_+=-]+', password)):
+            msg = [0,'Password needs to contain letters, numbers and special symbols!']
         else:
             # Account doesnt exists and the form data is valid, now insert new account into accounts table
             hashed = hashing.hash_value(password, salt='abcd')
@@ -200,6 +205,17 @@ def home():
     if 'loggedin' in session:
         # User is loggedin show them the home page
         return render_template('home.html', username=session['username'], role= session['role'])
+    # User is Non-loggedin show them the home page
+    return render_template('home.html', username="logout", role="logout")
+
+
+# http://localhost:5000/source - this will be the source page, only accessible for loggedin users
+@app.route('/source')
+def source():
+    # Check if user is loggedin
+    if 'loggedin' in session:
+        # User is loggedin show them the home page
+        return render_template('source.html', username=session['username'], role= session['role'])
     # User is Non-loggedin show them the home page
     return render_template('home.html', username="logout", role="logout")
 
@@ -250,8 +266,9 @@ def guide_details():
         # Convert binary blob data to base64 encoding
         image1 = base64.b64encode(details[10]).decode('utf-8')
         image2 = base64.b64encode(details[11]).decode('utf-8')
+        image3 = base64.b64encode(details[12]).decode('utf-8')
 
-        return render_template('guide_details.html', details=details, image1=image1, image2=image2, msg=msg, role=session['role'])
+        return render_template('guide_details.html', details=details, image1=image1, image2=image2, image3=image3, msg=msg, role=session['role'])
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
 
@@ -274,7 +291,7 @@ def guide_delete():
             details = cursor.fetchone()
 
             msg = [1,'You have deleted this guide details successfully!']
-            return render_template('guide_details.html', details=details, image1=None, image2=None, msg=msg, role="session['role']")
+            return render_template('guide_details.html', details=details, image1=None, image2=None, image3=None, msg=msg, role="session['role']")
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
 
@@ -324,8 +341,9 @@ def guide_edit():
                 # Convert binary blob data to base64 encoding
                 image1 = base64.b64encode(details[10]).decode('utf-8')
                 image2 = base64.b64encode(details[11]).decode('utf-8')
+                image3 = base64.b64encode(details[12]).decode('utf-8')
 
-                return render_template('guide_edit.html', details=details, image1=image1, image2=image2, msg=msg)
+                return render_template('guide_edit.html', details=details, image1=image1, image2=image2, image3=image3, msg=msg)
             
             elif request.method == "POST":
                 # Check if "firstname", "lastname" and "email" POST requests exist (user submitted form)
@@ -350,6 +368,10 @@ def guide_edit():
                     picture2 = request.files['photo2']
                     image2 = picture2.read()
                     picture2.close()
+                    
+                    picture3 = request.files['photo3']
+                    image3 = picture3.read()
+                    picture3.close()
 
                     # Update new guide details information into profile table
                     cursor = getCursor()
@@ -358,17 +380,29 @@ def guide_edit():
                                 WHERE id = %s;""" 
                     cursor.execute(sql1, (common_name, scientific_name, description, distribution, size, droppings, footprints, impact, control_methods, id, ))
                     # print("image1  "+picture2.filename)
-                    if picture1.filename !='' and picture2.filename !='':
-                        sql2 = """   UPDATE guide SET image1 = %s, image2 = %s WHERE id = %s;"""
-                        cursor.execute(sql2, (image1, image2, id, ))
+                    if picture1.filename !='' and picture2.filename !='' and picture3.filename !='':
+                        sql2 = """   UPDATE guide SET image1 = %s, image2 = %s, image3 = %s WHERE id = %s;"""
+                        cursor.execute(sql2, (image1, image2, image3, id, ))
 
-                    elif picture1.filename !='' and picture2.filename =='':
+                    elif picture1.filename !='' and picture2.filename =='' and picture3.filename =='':
                         sql3 = """   UPDATE guide  SET image1 = %s WHERE id = %s;"""
                         cursor.execute(sql3, (image1, id, ))
-
-                    elif picture1.filename =='' and picture2.filename !='':
+                    elif picture1.filename =='' and picture2.filename !='' and picture3.filename =='':
                         sql4 = """   UPDATE guide SET image2 = %s WHERE id = %s;"""
                         cursor.execute(sql4, (image2, id, ))
+                    elif picture1.filename =='' and picture2.filename =='' and picture3.filename !='':
+                        sql4 = """   UPDATE guide SET image3 = %s WHERE id = %s;"""
+                        cursor.execute(sql4, (image3, id, ))
+
+                    elif picture1.filename !='' and picture2.filename !='' and picture3.filename =='':
+                        sql4 = """   UPDATE guide SET image1 = %s, image2 = %s WHERE id = %s;"""
+                        cursor.execute(sql4, (image1, image2, id, ))
+                    elif picture1.filename =='' and picture2.filename !='' and picture3.filename !='':
+                        sql4 = """   UPDATE guide SET image2 = %s, image3 = %s WHERE id = %s;"""
+                        cursor.execute(sql4, (image2, image3, id, ))
+                    elif picture1.filename !='' and picture2.filename =='' and picture3.filename !='':
+                        sql4 = """   UPDATE guide SET image1 = %s, image3 = %s WHERE id = %s;"""
+                        cursor.execute(sql4, (image1, image3, id, ))
 
                     msg = [1,'You have updated this guide details successfully!']
 
@@ -381,8 +415,9 @@ def guide_edit():
                     # Convert binary blob data to base64 encoding
                     image1 = base64.b64encode(details_update[10]).decode('utf-8')
                     image2 = base64.b64encode(details_update[11]).decode('utf-8')
+                    image3 = base64.b64encode(details_update[12]).decode('utf-8')
 
-                    return render_template('guide_details.html', details=details_update, image1=image1, image2=image2, msg=msg)
+                    return render_template('guide_details.html', details=details_update, image1=image1, image2=image2, image3=image3, msg=msg)
                 else:
                     # Form is empty... (no POST data)
                     msg = 'Please fill out the form!'
@@ -421,10 +456,14 @@ def guide_add():
                     picture2 = request.files['photo2']
                     image2 = picture2.read()
                     picture2.close()
+
+                    picture3 = request.files['photo3']
+                    image3 = picture3.read()
+                    picture3.close()
                     # Update new guide details information into profile table
                     cursor = getCursor()
                     sql = """   INSERT INTO guide VALUES (NULL,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
-                    cursor.execute(sql, (common_name, scientific_name, description, distribution, size, droppings, footprints, impact, control_methods, image1, image2, ))
+                    cursor.execute(sql, (common_name, scientific_name, description, distribution, size, droppings, footprints, impact, control_methods, image1, image2, image3, ))
                     cursor.fetchall()
 
 
@@ -786,6 +825,8 @@ def password_reset():
                     msg = [0,'Please make sure that the new password entered twice is exactly the same!']
                 elif len(password) < 8:
                     msg = [0,'Please enter a password greater than or equal to 8 characters in length!']
+                elif not (re.search(r'\d+', password) and (re.search(r'[a-z]+', password) or re.search(r'[A-Z]+', password)) and re.search(r'[!@#$%^&*()_+=-]+', password)):
+                    msg = [0,'Password needs to contain letters, numbers and special symbols!']
                 else:
                     # Update new information into secureaccount table
                     cursor = getCursor()
