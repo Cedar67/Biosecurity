@@ -774,30 +774,51 @@ def password_reset():
                         WHERE secureaccount.id = %s"""
             cursor.execute(sql, (id,))
             account = cursor.fetchone()
-            return render_template('password_reset.html', account=account, id=id, seesionId = session['id'])
+            return render_template('password_reset.html', account=account, msg=msg, id=id, seesionId = session['id'])
         
         elif request.method == "POST":
             # Check if "password" POST requests exist (user submitted form)
             if 'password' in request.form:
                 # Get new Value from user
                 password = request.form['password']
-                # Update new information into secureaccount table
-                cursor = getCursor()
-                sql = """   UPDATE secureaccount 
-                            SET password = %s
-                            WHERE id = %s;"""
-                hashed = hashing.hash_value(password, salt='abcd')
-                cursor.execute(sql, (hashed, id, ))
-                cursor.fetchall()
-                cursor.close()
-                connection.close()  
-                msg = [1,'You have successfully changed password!']
- 
-                return render_template('password_reset.html', msg=msg, id=id, seesionId = session['id'])
+                oldpassword = request.form['oldpassword']
+                if password != oldpassword:
+                    msg = [0,'Please make sure that the new password entered twice is exactly the same!']
+                elif len(password) < 8:
+                    msg = [0,'Please enter a password greater than or equal to 8 characters in length!']
+                else:
+                    # Update new information into secureaccount table
+                    cursor = getCursor()
+                    sql = """   UPDATE secureaccount 
+                                SET password = %s
+                                WHERE id = %s;"""
+                    hashed = hashing.hash_value(password, salt='abcd')
+                    cursor.execute(sql, (hashed, id, ))
+                    cursor.fetchall()
+                    cursor.close()
+                    connection.close()  
+                    msg = [1,'You have successfully changed password!']
+
+                    # Get the username for change password
+                    cursor = getCursor()   
+                    sql = """   SELECT secureaccount.id, secureaccount.username 
+                                FROM secureaccount
+                                WHERE secureaccount.id = %s"""
+                    cursor.execute(sql, (id,))
+                    account = cursor.fetchone()
+                    return render_template('password_reset.html', account=account, msg=msg, id=id, seesionId = session['id'])
             else:
                 # Form is empty... (no POST data)
-                msg = 'Please fill out the form!'
+                msg = [0,'Please fill out the form!']
 
+            cursor = getCursor()   
+            sql = """   SELECT secureaccount.id, secureaccount.username 
+                        FROM secureaccount
+                        WHERE secureaccount.id = %s"""
+            cursor.execute(sql, (id,))
+            account = cursor.fetchone()
+            return render_template('password_reset.html', account=account, msg=msg, id=id, seesionId = session['id'])
+    
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
 
