@@ -43,7 +43,20 @@ __Access Account__
 
 ## Design Decisions
 
-__1. Colour scheme__
+__1. Blueprint Design Strategy__
+
+>The internal design of the software takes into account the sub-file management back-end Python programme. 
+>
+>All the backend code in one py file can lead to long files. It is not very readable, and it is not easy to maintain. 
+>
+>Therefore, I split the most of Administrator role code into admin.py, while keeping the rest of the functional code in app.py file.
+>
+>For future consideration, I'll be looking to split the Staff related functions into a staff.py file as well.
+>
+>Adopted Flask's Blueprint design strategy and framework.
+>
+
+__2. Colour scheme__
 
 >The overall colour scheme is considered to be royalblue, white and black. 
 >
@@ -55,7 +68,7 @@ So royalblue is used as the colour of the title, navigation bar and buttons.
 It also creates a colour contrast.
 
 
-__2. All users with different roles in one profile database table.__
+__3. All users with different roles in one profile database table.__
 >
 >Two reasons for this design:
 >
