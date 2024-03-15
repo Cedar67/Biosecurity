@@ -23,7 +23,7 @@
     {% if role == "Staff" %} 
         <p></p>  
         {% if id == seesionId %} 
-            <a href="profile_edit?id={{account[0]}}" class="input-lg text-center btn btn-primary btn-sm">Edit Profile</a>
+            <a href="profile_editown?id={{account[0]}}" class="input-lg text-center btn btn-primary btn-sm">Edit Profile</a>
             <a href="password_reset?id={{account[0]}}" class="input-lg text-center btn btn-primary btn-sm">Reset Password</a>  
         {% endif %}
         <p></p>  
@@ -33,7 +33,7 @@
     {% if role == "Controller" %} 
         <p></p>  
         {% if id == seesionId %} 
-            <a href="profile_edit?id={{account[0]}}" class="input-lg text-center btn btn-primary btn-sm">Edit Profile</a>
+            <a href="profile_editown?id={{account[0]}}" class="input-lg text-center btn btn-primary btn-sm">Edit Profile</a>
             <a href="password_reset?id={{account[0]}}" class="input-lg text-center btn btn-primary btn-sm">Reset Password</a>  
         {% endif %}
     {% endif %}

@@ -30,7 +30,7 @@
         </thead>
         <tbody>
             
-        <form id="add_form" name="add_form" action="/profile_add" method="post" enctype="multipart/form-data" autocomplete="off">
+        <form id="add_form" name="add_form" action="{{ url_for('admin.profile_add') }}" method="post" enctype="multipart/form-data" autocomplete="off">
             <tr>
                 <td>User Name:</td>
                 <td><input type="text" value="{{inputprofile[0]}}" name="username" placeholder="Input username here" required/></td>

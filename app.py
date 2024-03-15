@@ -16,70 +16,20 @@ import connect
 from flask_hashing import Hashing
 from admin import admin_page
 from staff import staff_page
+from interface import api_page
+from function import *
 
 app = Flask(__name__)
 
 app.register_blueprint(admin_page, url_prefix="/admin")
 app.register_blueprint(staff_page, url_prefix="/staff")
+app.register_blueprint(api_page, url_prefix="/interface")
 
 
 hashing = Hashing(app)  #create an instance of hashing
 
 # Change this to your secret key (can be anything, it's for extra protection)
 app.secret_key = 'your secret key'
-
-dbconn = None
-connection = None
-
-def getCursor():
-    global dbconn
-    global connection
-    connection = mysql.connector.connect(user=connect.dbuser, \
-    password=connect.dbpass, host=connect.dbhost, auth_plugin='mysql_native_password',\
-    database=connect.dbname, autocommit=True)
-    dbconn = connection.cursor()
-    return dbconn
-
-
-# It is just a test function. Used for add test image. 
-@app.route('/add_image', methods=['GET','POST'])
-def add_image():
-    if request.method == 'POST':
-        # Create variables for easy access
-        id = int(request.form['id'])
-        # image1 = request.form['phone1']
-        # image2 = request.form['phone2']
-
-        picture1 = request.files['photo1']
-        pictureByte1 = picture1.read()
-        picture1.close()
-        base64picture1 = base64.b64encode(pictureByte1).decode('utf-8')
-        
-        picture2 = request.files['photo2']
-        pictureByte2 = picture2.read()
-        picture2.close()
-        base64picture2 = base64.b64encode(pictureByte2).decode('utf-8')
-        
-        picture3 = request.files['photo3']
-        pictureByte3 = picture3.read()
-        picture3.close()
-        base64picture3 = base64.b64encode(pictureByte2).decode('utf-8')
-
-        cursor = getCursor()
-        sql = """   UPDATE guide 
-                    SET image1 = %s, image2 = %s, image3 = %s
-                    WHERE id = %s;"""   
-        # cursor.execute(sql, (base64picture1, base64picture2, id, ))
-        cursor.execute(sql, (pictureByte1, pictureByte2, pictureByte3, id, ))
-        cursor.fetchone()
-
-        # connection.commit()
-        msg = 'You have successfully registered!'
-        cursor.close()
-        connection.close()
-
-    # Show registration form with message (if any)
-    return render_template('add_image.html')
 
 
 @app.route('/')
@@ -552,8 +502,8 @@ def profile_details():
     return redirect(url_for('login'))
 
 
-@app.route('/profile_edit', methods=["GET","POST"])
-def profile_edit():
+@app.route('/profile_editown', methods=["GET","POST"])
+def profile_editown():
     # Check if user is loggedin
     if 'loggedin' in session:
         
@@ -575,7 +525,7 @@ def profile_edit():
                         WHERE secureaccount.id = %s"""
             cursor.execute(sql, (id,))
             account = cursor.fetchone()
-            return render_template('profile_edit.html', account=account, id=id, seesionId = session['id'], role = session['role'], msg=msg)
+            return render_template('profile_editown.html', account=account, id=id, seesionId = session['id'], role = session['role'], msg=msg)
         
         elif request.method == "POST":
             # Check if "firstname", "lastname" and "email" POST requests exist (user submitted form)
@@ -644,7 +594,7 @@ def profile_edit():
                         connection.close()   
                         return redirect(url_for('profile_list',role=department, msgCode=msg[0], msgContent=msg[1]))
                     
-                return render_template('profile_edit.html', account=inputprofile, id=id, seesionId = session['id'], role = session['role'], msg=msg)
+                return render_template('profile_editown.html', account=inputprofile, id=id, seesionId = session['id'], role = session['role'], msg=msg)
             else:
                 # Form is empty... (no POST data)
                 msg = 'Please fill out the form!'
@@ -671,125 +621,125 @@ def profile_list():
                         INNER JOIN secureaccount ON profile.id = secureaccount.id
                         WHERE profile.department = %s;"""
             
-            connection = getCursor()
+            cursor = getCursor()
 
             if session['role'] == "Staff":
                 roleSQL = ('Controller',)
-                connection.execute(sql, roleSQL)
-                profile_list = connection.fetchall()
+                cursor.execute(sql, roleSQL)
+                profile_list = cursor.fetchall()
                 return render_template("profile_view.html", profile_list = profile_list)
             
             if session['role'] == "Administrator":
                 role = request.args.get('role')
                 roleSQL = (role,)
-                connection.execute(sql, roleSQL)
-                profile_list = connection.fetchall()
+                cursor.execute(sql, roleSQL)
+                profile_list = cursor.fetchall()
                 return render_template("profile_manage.html", profile_list = profile_list, role=role, msg=msg)
 
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
 
 
-@app.route('/profile_add', methods=["GET","POST"])
-def profile_add():
-    # Check if user is loggedin
-    if 'loggedin' in session:
-        if session['role'] == "Administrator":
-            inputprofile = []
-            # Output message to Webpage
-            msg = [-1,""]
-            if request.method == "GET":
-                role = request.args.get('role')
-                return render_template('profile_add.html', inputprofile=inputprofile, msg=msg, role=role)
+# @app.route('/profile_add', methods=["GET","POST"])
+# def profile_add():
+#     # Check if user is loggedin
+#     if 'loggedin' in session:
+#         if session['role'] == "Administrator":
+#             inputprofile = []
+#             # Output message to Webpage
+#             msg = [-1,""]
+#             if request.method == "GET":
+#                 role = request.args.get('role')
+#                 return render_template('profile_add.html', inputprofile=inputprofile, msg=msg, role=role)
             
-            elif request.method == "POST":
-                # Check if "firstname", "lastname" and "email" POST requests exist (user submitted form)
-                if 'username' in request.form and 'position' in request.form and 'department' in request.form and 'email' in request.form:
-                    # Get new Value from user
-                    username = request.form['username']
-                    position = request.form['position']
-                    department = request.form['department']
-                    status = request.form['status']
-                    datejoined = request.form['datejoined']
-                    firstname = request.form['firstname']
-                    lastname = request.form['lastname']
-                    email = request.form['email']
-                    address = request.form['address']
-                    phone = request.form['phone']
-                    password = request.form['password']
-                    hashed = hashing.hash_value(password, salt='abcd')
-                    inputprofile = [username,firstname, lastname, email, address, phone, datejoined, position, department, status, password]
-                    # Check if account exists using MySQL
-                    cursor = getCursor()
-                    cursor.execute('SELECT * FROM secureaccount WHERE username = %s', (username,))
-                    account = cursor.fetchone()
-                    # If account exists show error and validation checks
-                    if account:
-                        msg = [0,'Account (User Name) already exists! Please input another username.']
-                    # Check if email address is valid
-                    elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
-                        msg = [0,'Invalid email address!']
-                    elif not re.match(r'[A-Za-z0-9]+', username):
-                        msg = [0,'Username must contain only characters and numbers!']
-                    elif not username or not password or not email:
-                        msg = 'Please fill out the form!'
-                    elif len(password) < 8:
-                        msg = [0,'Please enter a password greater than or equal to 8 characters in length!']
-                    else:
-                        # Add new profile information into profile table
-                        cursor = getCursor()
-                        sql1 = """   INSERT INTO profile VALUES (NULL,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""              
-                        cursor.execute(sql1, (firstname, lastname, email, address, phone, datejoined, position, department, status,))        
-                        cursor.execute('INSERT INTO secureaccount VALUES (NULL, %s, %s, %s)', (username, hashed, email,))
+#             elif request.method == "POST":
+#                 # Check if "firstname", "lastname" and "email" POST requests exist (user submitted form)
+#                 if 'username' in request.form and 'position' in request.form and 'department' in request.form and 'email' in request.form:
+#                     # Get new Value from user
+#                     username = request.form['username']
+#                     position = request.form['position']
+#                     department = request.form['department']
+#                     status = request.form['status']
+#                     datejoined = request.form['datejoined']
+#                     firstname = request.form['firstname']
+#                     lastname = request.form['lastname']
+#                     email = request.form['email']
+#                     address = request.form['address']
+#                     phone = request.form['phone']
+#                     password = request.form['password']
+#                     hashed = hashing.hash_value(password, salt='abcd')
+#                     inputprofile = [username,firstname, lastname, email, address, phone, datejoined, position, department, status, password]
+#                     # Check if account exists using MySQL
+#                     cursor = getCursor()
+#                     cursor.execute('SELECT * FROM secureaccount WHERE username = %s', (username,))
+#                     account = cursor.fetchone()
+#                     # If account exists show error and validation checks
+#                     if account:
+#                         msg = [0,'Account (User Name) already exists! Please input another username.']
+#                     # Check if email address is valid
+#                     elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
+#                         msg = [0,'Invalid email address!']
+#                     elif not re.match(r'[A-Za-z0-9]+', username):
+#                         msg = [0,'Username must contain only characters and numbers!']
+#                     elif not username or not password or not email:
+#                         msg = 'Please fill out the form!'
+#                     elif len(password) < 8:
+#                         msg = [0,'Please enter a password greater than or equal to 8 characters in length!']
+#                     else:
+#                         # Add new profile information into profile table
+#                         cursor = getCursor()
+#                         sql1 = """   INSERT INTO profile VALUES (NULL,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""              
+#                         cursor.execute(sql1, (firstname, lastname, email, address, phone, datejoined, position, department, status,))        
+#                         cursor.execute('INSERT INTO secureaccount VALUES (NULL, %s, %s, %s)', (username, hashed, email,))
                         
-                        message = 'You have successfully added a new '+ department +' user ( User Name: '+ username +' ) information!'
-                        msg = [1, message]
+#                         message = 'You have successfully added a new '+ department +' user ( User Name: '+ username +' ) information!'
+#                         msg = [1, message]
      
-                        cursor.close()
-                        connection.close()   
-                        return redirect(url_for('profile_list',role=department, msgCode=msg[0], msgContent=msg[1]))
-                else:
-                    # Form is empty... (no POST data)
-                    msg = [0,'Please fill out the form!']
+#                         cursor.close()
+#                         connection.close()   
+#                         return redirect(url_for('profile_list',role=department, msgCode=msg[0], msgContent=msg[1]))
+#                 else:
+#                     # Form is empty... (no POST data)
+#                     msg = [0,'Please fill out the form!']
             
-                return render_template('profile_add.html', inputprofile=inputprofile, msg=msg)
+#                 return render_template('profile_add.html', inputprofile=inputprofile, msg=msg)
 
-    # User is not loggedin redirect to login page
-    return redirect(url_for('login'))
+#     # User is not loggedin redirect to login page
+#     return redirect(url_for('login'))
 
 
-@app.route('/profile_delete', methods=["GET","POST"])
-def profile_delete():
-    # Check if user is loggedin
-    if 'loggedin' in session:
-        if session['role'] == "Administrator":
-            # Output message to Webpage
-            msg = [-1,""]
+# @app.route('/profile_delete', methods=["GET","POST"])
+# def profile_delete():
+#     # Check if user is loggedin
+#     if 'loggedin' in session:
+#         if session['role'] == "Administrator":
+#             # Output message to Webpage
+#             msg = [-1,""]
             
-            id = request.args.get('id')
+#             id = request.args.get('id')
 
-            # We need all the account info for the user so we can display it on the profile page
-            cursor = getCursor()   
-            sql = """   SELECT profile.*, secureaccount.username 
-                        FROM secureaccount 
-                        INNER JOIN profile ON secureaccount.id = profile.id 
-                        WHERE secureaccount.id = %s"""
-            cursor.execute(sql, (int(id),))
-            account = cursor.fetchone()
+#             # We need all the account info for the user so we can display it on the profile page
+#             cursor = getCursor()   
+#             sql = """   SELECT profile.*, secureaccount.username 
+#                         FROM secureaccount 
+#                         INNER JOIN profile ON secureaccount.id = profile.id 
+#                         WHERE secureaccount.id = %s"""
+#             cursor.execute(sql, (int(id),))
+#             account = cursor.fetchone()
             
-            # Delete this user in database
-            cursor = getCursor()   
-            sql = """   DELETE FROM profile 
-                        WHERE id = %s"""
-            cursor.execute(sql, (int(id),))
-            sql = """   DELETE FROM secureaccount 
-                        WHERE id = %s"""
-            cursor.execute(sql, (int(id),))
+#             # Delete this user in database
+#             cursor = getCursor()   
+#             sql = """   DELETE FROM profile 
+#                         WHERE id = %s"""
+#             cursor.execute(sql, (int(id),))
+#             sql = """   DELETE FROM secureaccount 
+#                         WHERE id = %s"""
+#             cursor.execute(sql, (int(id),))
 
-            msg = [1,'You have deleted this user profile successfully!']
-            return render_template('profile_details.html', account=account, id=id, seesionId = session['id'], role = session['role'], msg=msg)
-    # User is not loggedin redirect to login page
-    return redirect(url_for('login'))
+#             msg = [1,'You have deleted this user profile successfully!']
+#             return render_template('profile_details.html', account=account, id=id, seesionId = session['id'], role = session['role'], msg=msg)
+#     # User is not loggedin redirect to login page
+#     return redirect(url_for('login'))
 
 
 @app.route('/password_reset', methods=["GET","POST"])
