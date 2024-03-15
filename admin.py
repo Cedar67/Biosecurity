@@ -195,7 +195,6 @@ def profile_edit():
                         account = cursor.fetchone()
                         
                         cursor.close()
-                        connection.close()   
                         return render_template('profile_details.html', msg=msg, account=account, id=id, seesionId = session['id'])
                     else:
                         sql1 = """  UPDATE profile 
@@ -207,8 +206,7 @@ def profile_edit():
                         message = 'You have successfully updated '+ department +' user ( User Name: '+ username +' ) information!'
                         msg = [1, message]
      
-                        cursor.close()
-                        connection.close()   
+                        cursor.close()   
                         return redirect(url_for('profile_list',role=department, msgCode=msg[0], msgContent=msg[1]))
                     
                 return render_template('profile_edit.html', account=inputprofile, id=id, seesionId = session['id'], role = session['role'], msg=msg)

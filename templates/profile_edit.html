@@ -35,8 +35,11 @@
             </tr>
         </thead>
         <tbody>
-            
-        <form id="result_form" name="result_form" action="/profile_edit" method="post">
+        {% if role == "Administrator" %}
+            <form id="result_form" name="result_form" action="{{ url_for('admin.profile_edit') }}" method="post">
+        {% else %}
+            <form id="result_form" name="result_form" action="/profile_edit" method="post">
+        {% endif %}
             <tr>
                 <td>User ID:</td>
                 <td>{{ account[0] }}</td>
