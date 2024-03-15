@@ -56,7 +56,7 @@ __1. Blueprint Design Strategy__
 >Adopted Flask's Blueprint design strategy and framework.
 >
 
-__2. Colour scheme__
+__2. Colour Scheme__
 
 >The overall colour scheme is considered to be royalblue, white and black. 
 >
@@ -77,6 +77,15 @@ __3. All users with different roles in one profile database table.__
 >Secondly, the roles can be distinguished by the Department field. For example, the Controller user is assigned to the Controller department. This would consolidate all users into one table, which would help development efficiency.
 >
 >However, it is worth noting that if the number of user roles increases, it is still necessary to split the user roles into separate tables.
+
+
+__4. Image Storage Solution.__
+>
+>In order to reduce the size of the application catalogue, I have deliberately stored all the image data in a database. 
+>
+>This solution, my webapp can achieve the same display effect, but also make the program module independent. The data and code are completely separated. 
+>
+>In particular, the security of the image data is taken into account, because the data is stored in its own database completely independently.
 
 
 <br>
